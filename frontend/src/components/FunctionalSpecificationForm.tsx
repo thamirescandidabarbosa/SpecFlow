@@ -788,7 +788,7 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
                                         {...field}
                                         type="text"
                                         className="form-input"
-                                        placeholder="Ex: CARD-2025-001"
+                                        placeholder="Informe o número do card (ex: CARD-123)"
                                     />
                                 )}
                             />
@@ -808,7 +808,7 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
                                         {...field}
                                         type="text"
                                         className="form-input"
-                                        placeholder="Nome do projeto"
+                                        placeholder="Digite o nome completo do projeto"
                                     />
                                 )}
                             />
@@ -844,7 +844,7 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
                                         {...field}
                                         type="text"
                                         className="form-input"
-                                        placeholder="GMUD"
+                                        placeholder="Número da GMUD (opcional)"
                                     />
                                 )}
                             />
@@ -884,7 +884,7 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
                                         {...field}
                                         type="text"
                                         className="form-input"
-                                        placeholder="1.0"
+                                        placeholder="Versão do documento (ex: 1.0, 2.1)"
                                     />
                                 )}
                             />
@@ -938,7 +938,7 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
                                     {...field}
                                     className="form-input"
                                     rows={3}
-                                    placeholder="Comentários adicionais..."
+                                    placeholder="Informações adicionais relevantes para o projeto (opcional)"
                                 />
                             )}
                         />
@@ -972,7 +972,7 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
                                     {...field}
                                     className="form-input"
                                     rows={4}
-                                    placeholder="Descreva o desenvolvimento que será realizado..."
+                                    placeholder="Descreva com detalhes o desenvolvimento que será realizado, incluindo objetivos e escopo"
                                 />
                             )}
                         />
@@ -992,7 +992,7 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
                                     {...field}
                                     className="form-input"
                                     rows={6}
-                                    placeholder="Detalhe a especificação funcional..."
+                                    placeholder="Detalhe a especificação funcional, incluindo requisitos, regras de negócio e comportamentos esperados"
                                 />
                             )}
                         />
@@ -1012,7 +1012,7 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
                                     {...field}
                                     className="form-input"
                                     rows={4}
-                                    placeholder="Descreva as mudanças que serão implementadas..."
+                                    placeholder="Descreva precisamente as mudanças que serão implementadas, incluindo alterações em componentes e funcionalidades"
                                 />
                             )}
                         />
@@ -1048,7 +1048,7 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
                                         {...field}
                                         type="text"
                                         className="form-input"
-                                        placeholder="Ordem de execução"
+                                        placeholder="Sequência de execução (ex: 1, 2, 3 ou A, B, C)"
                                     />
                                 )}
                             />
@@ -1245,8 +1245,8 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
                                         <textarea
                                             {...field}
                                             className="form-input"
-                                            rows={3}
-                                            placeholder="Descreva o objetivo do cutover..."
+                                            rows={4}
+                                            placeholder="Descreva claramente o objetivo principal do plano de cutover e os resultados esperados"
                                         />
                                     )}
                                 />
@@ -1265,8 +1265,8 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
                                         <textarea
                                             {...field}
                                             className="form-input"
-                                            rows={3}
-                                            placeholder="Descreva o cronograma..."
+                                            rows={4}
+                                            placeholder="Defina o cronograma detalhado com datas e horários para cada etapa do cutover"
                                         />
                                     )}
                                 />
@@ -1285,8 +1285,8 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
                                         <textarea
                                             {...field}
                                             className="form-input"
-                                            rows={4}
-                                            placeholder="Liste as atividades detalhadas..."
+                                            rows={6}
+                                            placeholder="Liste todas as atividades em ordem cronológica, com responsáveis e tempos estimados para cada tarefa"
                                         />
                                     )}
                                 />
@@ -1305,8 +1305,8 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
                                         <textarea
                                             {...field}
                                             className="form-input"
-                                            rows={3}
-                                            placeholder="Liste as atividades de pré-checklist..."
+                                            rows={4}
+                                            placeholder="Enumere os itens que devem ser verificados antes do início do cutover para garantir prontidão"
                                         />
                                     )}
                                 />
@@ -1325,8 +1325,8 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
                                         <textarea
                                             {...field}
                                             className="form-input"
-                                            rows={3}
-                                            placeholder="Descreva o plano de comunicação..."
+                                            rows={4}
+                                            placeholder="Defina como as partes interessadas serão notificadas antes, durante e após o cutover"
                                         />
                                     )}
                                 />
@@ -1345,8 +1345,8 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
                                         <textarea
                                             {...field}
                                             className="form-input"
-                                            rows={3}
-                                            placeholder="Descreva os times e responsabilidades..."
+                                            rows={4}
+                                            placeholder="Descreva as equipes envolvidas e as responsabilidades específicas de cada uma durante o processo"
                                         />
                                     )}
                                 />
@@ -1365,8 +1365,8 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
                                         <textarea
                                             {...field}
                                             className="form-input"
-                                            rows={3}
-                                            placeholder="Descreva o plano de contingência..."
+                                            rows={4}
+                                            placeholder="Estabeleça planos de contingência e rollback em caso de falhas ou problemas críticos"
                                         />
                                     )}
                                 />
@@ -1385,8 +1385,8 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
                                         <textarea
                                             {...field}
                                             className="form-input"
-                                            rows={3}
-                                            placeholder="Defina os critérios de sucesso..."
+                                            rows={4}
+                                            placeholder="Defina os critérios claros para considerar o cutover bem-sucedido e autorizar o go-live"
                                         />
                                     )}
                                 />
@@ -1405,8 +1405,8 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
                                         <textarea
                                             {...field}
                                             className="form-input"
-                                            rows={3}
-                                            placeholder="Descreva o suporte pós go-live..."
+                                            rows={4}
+                                            placeholder="Detalhe como será fornecido o suporte após o go-live, incluindo responsáveis e canais de comunicação"
                                         />
                                     )}
                                 />
