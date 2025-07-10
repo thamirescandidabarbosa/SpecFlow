@@ -1,10 +1,10 @@
-// Formulário de configurações ajustado — otimizado por Thamires Candida Barbosa para melhor UX
+// Formulário de configurações ajustado — otimizado por Thamires Candida Barbosa 
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { toast } from 'react-toastify';
-import { User, Settings, Lock, Save, ChevronRight } from 'lucide-react';
+import { User, Settings, Lock, Save } from 'lucide-react';
 import api from '../services/api';
 
 interface UserProfile {
