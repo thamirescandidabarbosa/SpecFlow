@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/SpecFlow/static/css/main.68db1f76.css",
+    "main.js": "/SpecFlow/static/js/main.38dca309.js",
+    "index.html": "/SpecFlow/index.html",
+    "main.68db1f76.css.map": "/SpecFlow/static/css/main.68db1f76.css.map",
+    "main.38dca309.js.map": "/SpecFlow/static/js/main.38dca309.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.68db1f76.css",
+    "static/js/main.38dca309.js"
+  ]
+}
