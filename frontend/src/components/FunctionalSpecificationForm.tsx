@@ -6,31 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { getFileIcon, formatFileSize } from '../utils/fileUtils';
 import { toast } from 'react-toastify';
 import {
-    Plus,
-    Trash2,
-    Upload,
-    FileText,
-    Calendar,
-    User,
-    Settings,
-    Database,
-    Tag,
-    Building,
-    MessageSquare,
-    Clock,
-    Hash,
-    Play,
-    CheckCircle,
-    Target,
-    Users,
-    Shield,
-    BarChart3,
-    Headphones,
-    Rocket,
-    Edit,
-    Save,
-    X,
-    Folder
+    Rocket, Edit, Save, X, Folder, Settings, Tag, Building, User, Calendar, Hash, Database, MessageSquare, FileText, BarChart3, Trash2, Plus, Target, CheckCircle, Clock, Play, Users, Shield, Headphones, Upload
 } from 'lucide-react';
 import { FunctionalSpecification } from '../types';
 import { functionalSpecificationService } from '../services/functionalSpecificationService';
@@ -481,34 +457,17 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
             console.error('Erro ao atualizar especificação:', error);
             console.error('Resposta completa do erro:', error.response);
 
-            if (error.response?.data?.message) {
-                console.error('Mensagem específica do backend:', error.response.data.message);
-            }
-
-            if (error.response?.data?.errors) {
-                console.error('Erros de validação detalhados:', error.response.data.errors);
-            }
-
-            if (error.response?.status === 403) {
-                toast.error('Você não tem permissão para editar esta Especificação Funcional. Apenas o autor que criou a EF pode editá-la.');
-            } else if (error.response?.status === 400) {
-                const backendMessage = error.response?.data?.message || '';
-                const validationErrors = error.response?.data?.errors || [];
-
-                let errorMessage = 'Dados inválidos. Verifique os campos e tente novamente.';
-
-                if (backendMessage) {
-                    errorMessage += ` Detalhes: ${backendMessage}`;
+            let errorMessage = 'Erro ao atualizar especificação. ';
+            if (error.response) {
+                errorMessage += `Status: ${error.response.status}. `;
+                if (error.response.data?.message) {
+                    errorMessage += `Mensagem: ${error.response.data.message}. `;
                 }
-
-                if (validationErrors.length > 0) {
-                    errorMessage += ` Erros: ${validationErrors.join(', ')}`;
+                if (error.response.data?.errors) {
+                    errorMessage += `Erros: ${error.response.data.errors.join(', ')}. `;
                 }
-
-                toast.error(errorMessage);
-            } else {
-                toast.error('Erro ao atualizar especificação. Tente novamente.');
             }
+            toast.error(errorMessage);
             throw error;
         }
     };
@@ -523,10 +482,10 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
                 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
             ];
             const validExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.pdf', '.doc', '.docx'];
-            
-            const isValidType = validTypes.includes(file.type) || 
-                               validExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
-            
+
+            const isValidType = validTypes.includes(file.type) ||
+                validExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
+
             if (!isValidType) {
                 toast.error('Apenas arquivos de imagem (JPEG, PNG, GIF), PDF ou Word (DOC, DOCX) são permitidos.');
                 return;
@@ -636,7 +595,7 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
                 autoClose: 2000,
                 position: "bottom-right"
             });
-            
+
             console.log('👁️ Tentando visualizar arquivo:', fileName);
             await functionalSpecificationService.viewFile(fileId);
         } catch (error) {
@@ -653,10 +612,10 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
             const downloadToast = toast.loading(`Preparando download de "${fileName}"...`, {
                 position: "bottom-right"
             });
-            
+
             console.log('💾 Tentando baixar arquivo:', fileName);
             await functionalSpecificationService.downloadFile(fileId, fileName);
-            
+
             // Atualizar toast para sucesso
             toast.update(downloadToast, {
                 render: `"${fileName}" baixado com sucesso!`,
@@ -678,16 +637,16 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
         if (!window.confirm(`Tem certeza que deseja excluir o arquivo "${fileName}"? Esta ação não pode ser desfeita.`)) {
             return;
         }
-        
+
         try {
             // Mostrar toast informativo de início da exclusão
             const deleteToast = toast.loading(`Excluindo "${fileName}"...`, {
                 position: "bottom-right"
             });
-            
+
             console.log('🗑️ Tentando excluir arquivo:', fileName);
             await functionalSpecificationService.deleteFile(fileId);
-            
+
             // Atualizar toast para sucesso
             toast.update(deleteToast, {
                 render: `"${fileName}" excluído com sucesso!`,
@@ -696,7 +655,7 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
                 autoClose: 3000,
                 closeButton: true
             });
-            
+
             // Atualizar a lista de arquivos recarregando os dados da especificação
             if (mode === 'edit' && efId) {
                 await loadSpecificationData();
@@ -707,7 +666,7 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
             toast.error(`Erro ao excluir "${fileName}": ${errorMessage}`);
         }
     };
-// (Removido: handleGeneratePublicLink não era utilizado)
+    // (Removido: handleGeneratePublicLink não era utilizado)
 
     // Estado de loading inicial para modo de edição
     if (mode === 'edit' && loading) {
@@ -833,7 +792,7 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
 
                         <div className="form-group">
                             <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                <mode size={16} aria-label="GMUD" />
+                                <span style={{ width: 16, display: 'inline-block' }} aria-label="GMUD"></span>
                                 GMUD
                             </label>
                             <Controller
@@ -961,7 +920,7 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
 
                     <div className="form-group">
                         <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <mode size={16} aria-label="Descrição do desenvolvimento" />
+                            <Edit size={16} aria-label="Descrição do desenvolvimento" />
                             Descrição do Desenvolvimento *
                         </label>
                         <Controller
@@ -1463,7 +1422,7 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
 
                         <div className="form-group">
                             <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                <mode size={16} aria-label="Testes unitários" />
+                                <Folder size={16} aria-label="Testes unitários" />
                                 Testes Unitários
                             </label>
                             <input
@@ -1622,7 +1581,15 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
                                                 </button>
                                                 <button
                                                     type="button"
-                                                    onClick={() => handleDownloadFile(file.id, file.originalName)}
+                                                    onClick={async () => {
+                                                        try {
+                                                            // Busca o token público e a URL
+                                                            const res = await functionalSpecificationService.generatePublicFileToken(file.id);
+                                                            window.open(res.downloadUrl, '_blank');
+                                                        } catch (err) {
+                                                            toast.error('Erro ao obter link de download do anexo.');
+                                                        }
+                                                    }}
                                                     style={{
                                                         padding: '4px 8px',
                                                         fontSize: '11px',

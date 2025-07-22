@@ -46,7 +46,7 @@ const multerConfig = {
         // Tipos MIME permitidos
         const allowedMimeTypes = [
             'image/jpeg',
-            'image/jpg', 
+            'image/jpg',
             'image/png',
             'image/gif',
             'application/pdf',
@@ -56,11 +56,11 @@ const multerConfig = {
             'application/vnd.ms-excel',
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         ];
-        
+
         // Extensões permitidas
         const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.pdf', '.doc', '.docx', '.txt', '.xls', '.xlsx'];
         const fileExtension = extname(file.originalname).toLowerCase();
-        
+
         const isMimeTypeValid = allowedMimeTypes.includes(file.mimetype);
         const isExtensionValid = allowedExtensions.includes(fileExtension);
 
@@ -178,13 +178,13 @@ export class EfController {
     async downloadFile(@Param('fileId') fileId: string, @Res() res: Response) {
         try {
             const file = await this.efService.getFileById(fileId);
-            
+
             if (!file) {
                 return res.status(404).json({ error: 'Arquivo não encontrado' });
             }
 
             const filePath = path.join('./uploads/ef', file.filename);
-            
+
             if (!fs.existsSync(filePath)) {
                 return res.status(404).json({ error: 'Arquivo não encontrado no sistema de arquivos' });
             }
@@ -192,7 +192,7 @@ export class EfController {
             // Configurar headers para download
             res.setHeader('Content-Type', file.mimetype);
             res.setHeader('Content-Disposition', `attachment; filename="${file.originalName}"`);
-            
+
             // Enviar arquivo
             res.sendFile(path.resolve(filePath));
         } catch (error) {
@@ -205,13 +205,13 @@ export class EfController {
     async viewFile(@Param('fileId') fileId: string, @Res() res: Response) {
         try {
             const file = await this.efService.getFileById(fileId);
-            
+
             if (!file) {
                 return res.status(404).json({ error: 'Arquivo não encontrado' });
             }
 
             const filePath = path.join('./uploads/ef', file.filename);
-            
+
             if (!fs.existsSync(filePath)) {
                 return res.status(404).json({ error: 'Arquivo não encontrado no sistema de arquivos' });
             }
@@ -219,7 +219,7 @@ export class EfController {
             // Configurar headers para visualização inline (não download)
             res.setHeader('Content-Type', file.mimetype);
             res.setHeader('Content-Disposition', `inline; filename="${file.originalName}"`);
-            
+
             // Enviar arquivo
             res.sendFile(path.resolve(filePath));
         } catch (error) {
@@ -298,19 +298,19 @@ export class EfController {
         try {
             // Verificar se o token é válido (simples verificação por enquanto)
             const expectedToken = this.generateFileToken(fileId);
-            
+
             if (token !== expectedToken) {
                 return res.status(401).json({ error: 'Token inválido' });
             }
 
             const file = await this.efService.getFileById(fileId);
-            
+
             if (!file) {
                 return res.status(404).json({ error: 'Arquivo não encontrado' });
             }
 
             const filePath = path.join('./uploads/ef', file.filename);
-            
+
             if (!fs.existsSync(filePath)) {
                 return res.status(404).json({ error: 'Arquivo não encontrado no sistema de arquivos' });
             }
@@ -318,7 +318,7 @@ export class EfController {
             // Configurar headers para download
             res.setHeader('Content-Type', file.mimetype);
             res.setHeader('Content-Disposition', `attachment; filename="${file.originalName}"`);
-            
+
             // Enviar arquivo
             res.sendFile(path.resolve(filePath));
         } catch (error) {
@@ -333,19 +333,19 @@ export class EfController {
         try {
             // Verificar se o token é válido
             const expectedToken = this.generateFileToken(fileId);
-            
+
             if (token !== expectedToken) {
                 return res.status(401).json({ error: 'Token inválido' });
             }
 
             const file = await this.efService.getFileById(fileId);
-            
+
             if (!file) {
                 return res.status(404).json({ error: 'Arquivo não encontrado' });
             }
 
             const filePath = path.join('./uploads/ef', file.filename);
-            
+
             if (!fs.existsSync(filePath)) {
                 return res.status(404).json({ error: 'Arquivo não encontrado no sistema de arquivos' });
             }
@@ -353,7 +353,7 @@ export class EfController {
             // Configurar headers para visualização inline
             res.setHeader('Content-Type', file.mimetype);
             res.setHeader('Content-Disposition', `inline; filename="${file.originalName}"`);
-            
+
             // Enviar arquivo
             res.sendFile(path.resolve(filePath));
         } catch (error) {
