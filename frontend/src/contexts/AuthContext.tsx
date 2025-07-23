@@ -37,12 +37,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const login = async (credentials: LoginRequest) => {
         try {
             const authData = await authService.login(credentials);
+            if (!authData.access_token || !authData.user) {
+                throw new Error('Credenciais inválidas');
+            }
             authService.storeAuth(authData);
             setUser(authData.user);
-            toast.success('Login realizado com sucesso!');
+            toast.success('Login realizado com sucesso!', { autoClose: 5000 });
         } catch (error: any) {
-            const message = error.response?.data?.message || 'Erro ao fazer login';
-            toast.error(message);
+            const message = error.response?.data?.message || error.message || 'Erro ao fazer login';
+            toast.error(message, { autoClose: 5000 });
             throw error;
         }
     };
@@ -52,10 +55,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             const authData = await authService.register(userData);
             authService.storeAuth(authData);
             setUser(authData.user);
-            toast.success('Cadastro realizado com sucesso!');
+            toast.success('Cadastro realizado com sucesso!', { autoClose: 5000 });
         } catch (error: any) {
             const message = error.response?.data?.message || 'Erro ao fazer cadastro';
-            toast.error(message);
+            toast.error(message, { autoClose: 5000 });
             throw error;
         }
     };
@@ -63,7 +66,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const logout = () => {
         authService.logout();
         setUser(null);
-        toast.info('Logout realizado com sucesso!');
+        toast.info('Logout realizado com sucesso!', { autoClose: 5000 });
     };
 
     const value: AuthContextType = {
