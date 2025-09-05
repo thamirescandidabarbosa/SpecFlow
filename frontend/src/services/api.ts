@@ -1,7 +1,17 @@
 import axios from 'axios';
 
+// Configuração dinâmica da URL base da API
+const getBaseURL = () => {
+    // Em produção, usa a variável de ambiente
+    if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_API_URL) {
+        return process.env.REACT_APP_API_URL;
+    }
+    // Em desenvolvimento, usa localhost
+    return 'http://localhost:3001/api';
+};
+
 const api = axios.create({
-    baseURL: '/api',
+    baseURL: getBaseURL(),
 });
 
 // Interceptor para adicionar token de autorização
