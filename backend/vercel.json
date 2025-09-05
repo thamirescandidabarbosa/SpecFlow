@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "dist/src/main.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "dist/src/main.js"
+    }
+  ],
+  "env": {
+    "DATABASE_URL": "file:./vercel.db",
+    "JWT_SECRET": "specflow-super-secret-jwt-key-2025",
+    "JWT_EXPIRES_IN": "7d",
+    "NODE_ENV": "production",
+    "CORS_ORIGIN": "https://specflow-app.surge.sh"
+  }
+}

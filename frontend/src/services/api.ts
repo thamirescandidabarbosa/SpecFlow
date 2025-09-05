@@ -1,7 +1,18 @@
 import axios from 'axios';
 
+// Configure a URL base da API baseada no ambiente
+const getBaseURL = () => {
+    // Se estiver em desenvolvimento, usa localhost
+    if (process.env.NODE_ENV === 'development') {
+        return 'http://localhost:3001';
+    }
+    
+    // Em produção, usa a URL do backend no Railway (atualize quando fizer deploy)
+    return process.env.REACT_APP_API_URL || 'https://specflow-backend.railway.app';
+};
+
 const api = axios.create({
-    baseURL: '/api',
+    baseURL: getBaseURL(),
 });
 
 // Interceptor para adicionar token de autorização

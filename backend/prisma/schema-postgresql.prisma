@@ -1,0 +1,95 @@
+// Schema Prisma otimizado para PostgreSQL (Supabase)
+// Use este schema quando migrar para produção
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // Mudança para PostgreSQL
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  role      String   @default("ANALYST") // ADMIN, ANALYST, USER
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamentos
+  fileUploads             FileUpload[]
+  functionalSpecifications FunctionalSpecification[]
+
+  @@map("users") // Nome da tabela no PostgreSQL
+}
+
+model FileUpload {
+  id          String   @id @default(uuid())
+  filename    String
+  originalName String
+  mimetype    String
+  size        Int
+  path        String
+  uploadedBy  String
+  uploadedAt  DateTime @default(now())
+
+  // Relacionamentos
+  user                    User                     @relation(fields: [uploadedBy], references: [id], onDelete: Cascade)
+  functionalSpecification FunctionalSpecification?
+
+  @@map("file_uploads")
+}
+
+model FunctionalSpecification {
+  id               String   @id @default(uuid())
+  title            String
+  description      String?
+  priority         String   @default("MEDIUM") // HIGH, MEDIUM, LOW
+  status           String   @default("DRAFT") // DRAFT, REVIEW, APPROVED, REJECTED
+  version          String   @default("1.0")
+  createdBy        String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  // Campos específicos da EF
+  businessRules    String?  @db.Text
+  acceptanceCriteria String? @db.Text
+  assumptions      String?  @db.Text
+  constraints      String?  @db.Text
+  dependencies     String?  @db.Text
+  
+  // Arquivos anexos
+  processDiagramId String?  @unique
+  unitTestsId      String?  @unique
+  
+  // Relacionamentos
+  creator          User       @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  processDiagram   FileUpload? @relation(fields: [processDiagramId], references: [id], onDelete: SetNull)
+  unitTests        FileUpload? @relation(fields: [unitTestsId], references: [id], onDelete: SetNull)
+  functionalRequests FunctionalRequest[]
+
+  @@map("functional_specifications")
+}
+
+model FunctionalRequest {
+  id            String   @id @default(uuid())
+  title         String
+  description   String?  @db.Text
+  priority      String   @default("MEDIUM") // HIGH, MEDIUM, LOW
+  status        String   @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, REJECTED
+  requestedBy   String   // Email ou nome do solicitante
+  requestedAt   DateTime @default(now())
+  specificationId String
+  
+  // Relacionamentos
+  specification FunctionalSpecification @relation(fields: [specificationId], references: [id], onDelete: Cascade)
+
+  @@map("functional_requests")
+}
+
+// Indices para otimização de performance
+// Os índices são criados automaticamente para campos @unique e @id
+// Índices adicionais podem ser criados conforme necessário

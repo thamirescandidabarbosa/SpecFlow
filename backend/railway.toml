@@ -1,0 +1,10 @@
+# Railway deployment configuration
+[build]
+command = "npm install && npm run build && npx prisma generate"
+
+[deploy]
+startCommand = "npm run start:prod"
+
+[env]
+NODE_ENV = "production"
+PORT = "3001"

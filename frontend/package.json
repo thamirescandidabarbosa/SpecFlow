@@ -31,7 +31,8 @@
         "start": "react-scripts start",
         "build": "react-scripts build",
         "test": "react-scripts test",
-        "eject": "react-scripts eject"
+        "eject": "react-scripts eject",
+        "deploy": "npm run build && copy public\\200.html build\\200.html && surge build specflow-app.surge.sh"
     },
     "eslintConfig": {
         "extends": [
@@ -54,6 +55,7 @@
     "proxy": "http://localhost:3001",
     "devDependencies": {
         "@types/react": "^18.2.0",
-        "@types/react-dom": "^18.2.0"
+        "@types/react-dom": "^18.2.0",
+        "surge": "^0.24.6"
     }
 }

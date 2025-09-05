@@ -8,6 +8,7 @@ import { FilesModule } from './files/files.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { EfModule } from './ef/ef.module';
+import { SupabaseModule } from './supabase/supabase.module';
 
 @Module({
     imports: [
@@ -19,6 +20,7 @@ import { EfModule } from './ef/ef.module';
             serveRoot: '/uploads',
         }),
         PrismaModule,
+        SupabaseModule,
         AuthModule,
         UsersModule,
         FilesModule,
