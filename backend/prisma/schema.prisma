@@ -1,12 +1,9 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -15,74 +12,68 @@ model User {
   username  String   @unique
   email     String   @unique
   password  String
-  role      String   @default("ANALYST") // ADMIN, ANALYST, USER
+  role      String   @default("ANALYST")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relacionamentos
-  uploads   FileUpload[]
+  uploads                  FileUpload[]
   functionalSpecifications FunctionalSpecification[]
 
   @@map("users")
 }
 
 model FileUpload {
-  id           String     @id @default(uuid())
-  filename     String
-  originalName String
-  mimetype     String
-  size         Int
-  path         String
-  uploadedById String
+  id                        String     @id @default(uuid())
+  filename                  String
+  originalName              String
+  mimetype                  String
+  size                      Int
+  path                      String
+  uploadedById              String
   functionalSpecificationId String?
-  createdAt    DateTime   @default(now())
+  createdAt                 DateTime   @default(now())
 
-  // Relacionamentos
-  uploadedBy   User       @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
-  functionalSpecification FunctionalSpecification? @relation(fields: [functionalSpecificationId], references: [id], onDelete: SetNull)
+  uploadedBy                User       @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
+  functionalSpecification   FunctionalSpecification? @relation(fields: [functionalSpecificationId], references: [id], onDelete: SetNull)
 
   @@map("file_uploads")
 }
 
 model FunctionalSpecification {
-  id                      String   @id @default(uuid())
-  cardNumber              String
-  projectName             String
-  technicalAnalyst        String
-  gmud                    String?
-  date                    DateTime
-  version                 String
-  developmentEnvironment  String   // EQ0, EP0, ED0
-  author                  String
-  comment                 String?
-  developmentDescription  String
-  functionalSpecification String
-  changeDescription       String
-  order                   String?
-  status                  String   // Em andamento, Pronto, Cancelado, Em análise, Aprovado
-  startDateTime           DateTime
-  endDateTime             DateTime?
-  
-  // Cutover Plan
-  includeCutoverPlan      Boolean  @default(false)
-  cutoverObjective        String?
-  cutoverTimeline         String?
-  cutoverDetailedActivities String?
-  cutoverPreChecklistActivities String?
-  cutoverCommunicationPlan String?
-  cutoverTeamsAndResponsibilities String?
-  cutoverContingencyPlan  String?
-  cutoverSuccessCriteria  String?
-  cutoverPostGoLiveSupport String?
-  
-  authorId                String
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  id                               String   @id @default(uuid())
+  cardNumber                       String
+  projectName                      String
+  technicalAnalyst                 String
+  gmud                             String?
+  date                             DateTime
+  version                          String
+  developmentEnvironment           String
+  author                           String
+  comment                          String?
+  developmentDescription           String
+  functionalSpecification          String
+  changeDescription                String
+  order                            String?
+  status                           String
+  startDateTime                    DateTime
+  endDateTime                      DateTime?
+  includeCutoverPlan               Boolean  @default(false)
+  cutoverObjective                 String?
+  cutoverTimeline                  String?
+  cutoverDetailedActivities        String?
+  cutoverPreChecklistActivities    String?
+  cutoverCommunicationPlan         String?
+  cutoverTeamsAndResponsibilities  String?
+  cutoverContingencyPlan           String?
+  cutoverSuccessCriteria           String?
+  cutoverPostGoLiveSupport         String?
+  authorId                         String
+  createdAt                        DateTime @default(now())
+  updatedAt                        DateTime @updatedAt
 
-  // Relacionamentos
-  author_user             User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  requests                FunctionalRequest[]
-  files                   FileUpload[]
+  author_user                      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  requests                         FunctionalRequest[]
+  files                            FileUpload[]
 
   @@map("functional_specifications")
 }
@@ -94,7 +85,6 @@ model FunctionalRequest {
   functionalSpecificationId String
   createdAt                 DateTime @default(now())
 
-  // Relacionamentos
   functionalSpecification   FunctionalSpecification @relation(fields: [functionalSpecificationId], references: [id], onDelete: Cascade)
 
   @@map("functional_requests")

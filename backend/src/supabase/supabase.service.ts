@@ -4,25 +4,31 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class SupabaseService {
-  private supabase: SupabaseClient;
+  private supabase?: SupabaseClient;
   private readonly logger = new Logger(SupabaseService.name);
 
   constructor(private configService: ConfigService) {
     const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
-    const supabaseKey = this.configService.get<string>('SUPABASE_ANON_KEY');
-    
-    // Só inicializa se as credenciais estiverem configuradas
+    const serviceRoleKey = this.configService.get<string>('SUPABASE_SERVICE_ROLE_KEY');
+    const anonKey = this.configService.get<string>('SUPABASE_ANON_KEY');
+    const supabaseKey = serviceRoleKey || anonKey;
+
     if (supabaseUrl && supabaseKey && !supabaseUrl.includes('placeholder')) {
-      this.supabase = createClient(supabaseUrl, supabaseKey);
+      this.supabase = createClient(supabaseUrl, supabaseKey, {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      });
       this.logger.log('Supabase client initialized successfully');
     } else {
-      this.logger.warn('Supabase not configured - using local storage');
+      this.logger.warn('Supabase not configured - using local fallback where available');
     }
   }
 
   getClient(): SupabaseClient {
     if (!this.supabase) {
-      throw new Error('Supabase não configurado. Configure SUPABASE_URL e SUPABASE_ANON_KEY');
+      throw new Error('Supabase nao configurado. Configure SUPABASE_URL e uma chave valida');
     }
     return this.supabase;
   }
@@ -31,13 +37,12 @@ export class SupabaseService {
     return !!this.supabase;
   }
 
-  // Método para upload de arquivos
   async uploadFile(bucket: string, fileName: string, file: Buffer, contentType: string) {
-    const { data, error } = await this.supabase.storage
+    const { data, error } = await this.getClient().storage
       .from(bucket)
       .upload(fileName, file, {
         contentType,
-        upsert: true
+        upsert: true,
       });
 
     if (error) {
@@ -47,9 +52,8 @@ export class SupabaseService {
     return data;
   }
 
-  // Método para baixar arquivos
   async downloadFile(bucket: string, fileName: string) {
-    const { data, error } = await this.supabase.storage
+    const { data, error } = await this.getClient().storage
       .from(bucket)
       .download(fileName);
 
@@ -60,22 +64,8 @@ export class SupabaseService {
     return data;
   }
 
-  // Método para listar arquivos
-  async listFiles(bucket: string, folder?: string) {
-    const { data, error } = await this.supabase.storage
-      .from(bucket)
-      .list(folder);
-
-    if (error) {
-      throw new Error(`Erro ao listar arquivos: ${error.message}`);
-    }
-
-    return data;
-  }
-
-  // Método para deletar arquivos
   async deleteFile(bucket: string, fileName: string) {
-    const { data, error } = await this.supabase.storage
+    const { data, error } = await this.getClient().storage
       .from(bucket)
       .remove([fileName]);
 
@@ -84,5 +74,13 @@ export class SupabaseService {
     }
 
     return data;
+  }
+
+  getPublicUrl(bucket: string, fileName: string) {
+    const { data } = this.getClient().storage
+      .from(bucket)
+      .getPublicUrl(fileName);
+
+    return data.publicUrl;
   }
 }

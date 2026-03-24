@@ -8,17 +8,12 @@ import {
     UseInterceptors,
     UploadedFile,
     Request,
-    Query,
     BadRequestException,
     Res,
-    NotFoundException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname, join } from 'path';
-import { v4 as uuidv4 } from 'uuid';
+import { memoryStorage } from 'multer';
 import { Response } from 'express';
-import { createReadStream, existsSync } from 'fs';
 import { FilesService } from './files.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -30,17 +25,8 @@ export class FilesController {
     @Post('upload')
     @UseInterceptors(
         FileInterceptor('file', {
-            storage: diskStorage({
-                destination: './uploads',
-                filename: (req, file, callback) => {
-                    const uniqueSuffix = uuidv4();
-                    const ext = extname(file.originalname);
-                    const filename = `${uniqueSuffix}${ext}`;
-                    callback(null, filename);
-                },
-            }),
+            storage: memoryStorage(),
             fileFilter: (req, file, callback) => {
-                // Permitir imagens, PDFs e documentos Word
                 const allowedMimes = [
                     'image/jpeg',
                     'image/jpg',
@@ -54,17 +40,18 @@ export class FilesController {
                     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
                 ];
 
+                const fileName = file.originalname.toLowerCase();
                 const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.pdf', '.doc', '.docx', '.txt', '.xls', '.xlsx'];
-                const fileExtension = extname(file.originalname).toLowerCase();
+                const isAllowedExtension = allowedExtensions.some((extension) => fileName.endsWith(extension));
 
-                if (allowedMimes.includes(file.mimetype) || allowedExtensions.includes(fileExtension)) {
+                if (allowedMimes.includes(file.mimetype) || isAllowedExtension) {
                     callback(null, true);
                 } else {
-                    callback(new Error(`Tipo de arquivo não permitido: ${file.mimetype} (${fileExtension})`), false);
+                    callback(new Error(`Tipo de arquivo nao permitido: ${file.mimetype}`), false);
                 }
             },
             limits: {
-                fileSize: 10 * 1024 * 1024, // 10MB
+                fileSize: 10 * 1024 * 1024,
             },
         }),
     )
@@ -94,41 +81,14 @@ export class FilesController {
         return this.filesService.remove(id);
     }
 
-    @Get('serve/:filename')
-    async serveFile(@Param('filename') filename: string, @Res() res: Response) {
-        const filePath = join(process.cwd(), 'uploads', filename);
-        
-        if (!existsSync(filePath)) {
-            throw new NotFoundException('Arquivo não encontrado');
-        }
+    @Get(':id/download')
+    async download(@Param('id') id: string, @Res() res: Response) {
+        const file = await this.filesService.downloadFile(id);
+        const arrayBuffer = await file.data.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
 
-        const file = createReadStream(filePath);
-        
-        // Determinar o tipo de conteúdo baseado na extensão
-        const ext = extname(filename).toLowerCase();
-        let contentType = 'application/octet-stream';
-        
-        switch (ext) {
-            case '.jpg':
-            case '.jpeg':
-                contentType = 'image/jpeg';
-                break;
-            case '.png':
-                contentType = 'image/png';
-                break;
-            case '.gif':
-                contentType = 'image/gif';
-                break;
-            case '.pdf':
-                contentType = 'application/pdf';
-                break;
-        }
-
-        res.set({
-            'Content-Type': contentType,
-            'Cache-Control': 'public, max-age=3600',
-        });
-
-        file.pipe(res);
+        res.setHeader('Content-Type', file.mimetype);
+        res.setHeader('Content-Disposition', `attachment; filename="${file.filename}"`);
+        res.send(buffer);
     }
 }

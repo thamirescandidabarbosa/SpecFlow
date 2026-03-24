@@ -1,25 +1,39 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import * as fs from 'fs';
-import * as path from 'path';
+import { SupabaseService } from '../supabase/supabase.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class FilesService {
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        private supabaseService: SupabaseService,
+    ) { }
 
     async uploadFile(file: Express.Multer.File, uploadedById: string) {
-        const fileRecord = await this.prisma.fileUpload.create({
+        const fileName = `${uuidv4()}-${file.originalname}`;
+
+        if (!file.buffer) {
+            throw new Error('Arquivo invalido para upload em memoria');
+        }
+
+        await this.supabaseService.uploadFile(
+            'uploads',
+            fileName,
+            file.buffer,
+            file.mimetype
+        );
+
+        return this.prisma.fileUpload.create({
             data: {
-                filename: file.filename,
+                filename: fileName,
                 originalName: file.originalname,
                 mimetype: file.mimetype,
                 size: file.size,
-                path: file.path,
+                path: `uploads/${fileName}`,
                 uploadedById,
             },
         });
-
-        return fileRecord;
     }
 
     async findAll() {
@@ -40,7 +54,7 @@ export class FilesService {
     }
 
     async findOne(id: string) {
-        return this.prisma.fileUpload.findUnique({
+        const file = await this.prisma.fileUpload.findUnique({
             where: { id },
             include: {
                 uploadedBy: {
@@ -52,27 +66,36 @@ export class FilesService {
                 },
             },
         });
+
+        if (!file) {
+            throw new NotFoundException('Arquivo nao encontrado');
+        }
+
+        return file;
+    }
+
+    async downloadFile(id: string) {
+        const file = await this.findOne(id);
+        const data = await this.supabaseService.downloadFile('uploads', file.filename);
+
+        return {
+            data,
+            filename: file.originalName,
+            mimetype: file.mimetype,
+        };
     }
 
     async remove(id: string) {
-        const file = await this.prisma.fileUpload.findUnique({
+        const file = await this.findOne(id);
+
+        await this.supabaseService.deleteFile('uploads', file.filename);
+
+        return this.prisma.fileUpload.delete({
             where: { id },
         });
+    }
 
-        if (file) {
-            // Remover arquivo do sistema de arquivos
-            try {
-                fs.unlinkSync(file.path);
-            } catch (error) {
-                console.error('Erro ao remover arquivo:', error);
-            }
-
-            // Remover registro do banco
-            return this.prisma.fileUpload.delete({
-                where: { id },
-            });
-        }
-
-        return null;
+    getFilePublicUrl(filename: string) {
+        return this.supabaseService.getPublicUrl('uploads', filename);
     }
 }
