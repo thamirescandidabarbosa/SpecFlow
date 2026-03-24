@@ -23,7 +23,7 @@ function App() {
     return (
         <QueryClientProvider client={queryClient}>
             <AuthProvider>
-                <Router>
+                <Router basename={process.env.PUBLIC_URL}>
                     <div className="App">
                         <Navbar />
                         <main className="container" style={{ marginTop: '20px' }}>

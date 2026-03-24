@@ -1,4 +1,4 @@
-import api from './api';
+import api, { getUploadsBaseURL } from './api';
 import { FileUpload } from '../types';
 
 export const filesService = {
@@ -29,6 +29,6 @@ export const filesService = {
     },
 
     getFileUrl(filename: string): string {
-        return `http://localhost:3001/api/uploads/${filename}`;
+        return `${getUploadsBaseURL()}/${filename}`;
     },
 };

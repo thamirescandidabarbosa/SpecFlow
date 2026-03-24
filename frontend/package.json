@@ -1,6 +1,7 @@
 {
     "name": "fullstack-frontend",
     "version": "1.0.0",
+    "homepage": "https://thamirescandidabarbosa.github.io/SpecFlow",
     "private": true,
     "dependencies": {
         "@hookform/resolvers": "^3.3.1",

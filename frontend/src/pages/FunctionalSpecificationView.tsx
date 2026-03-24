@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { getUploadsBaseURL } from '../services/api';
 import { functionalSpecificationService } from '../services/functionalSpecificationService';
 import { FunctionalSpecification } from '../types';
 import { 
@@ -1060,7 +1061,7 @@ const FunctionalSpecificationView: React.FC = () => {
                                     <FileText size={16} />
                                     <span>{spec.processdiagram.originalName}</span>
                                     <a 
-                                        href={`http://localhost:3001/api/uploads/${spec.processdiagram.filename}`}
+                                        href={`${getUploadsBaseURL()}/${spec.processdiagram.filename}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="btn btn-sm btn-outline-primary"
@@ -1096,7 +1097,7 @@ const FunctionalSpecificationView: React.FC = () => {
                                             <FileText size={16} />
                                             <span>{file.originalName}</span>
                                             <a 
-                                                href={`http://localhost:3001/api/uploads/${file.filename}`}
+                                                href={`${getUploadsBaseURL()}/${file.filename}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="btn btn-sm btn-outline-primary"
