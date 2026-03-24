@@ -64,7 +64,20 @@ const Navbar: React.FC = () => {
                 height: '60px'
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
-                    <h2 style={{ margin: 0, color: '#333' }}>SPECFLOW</h2>
+                    <Link
+                        to="/"
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            textDecoration: 'none'
+                        }}
+                    >
+                        <img
+                            src={`${process.env.PUBLIC_URL}/logoSpecFlow.png`}
+                            alt="SpecFlow"
+                            style={{ height: '42px', width: 'auto', display: 'block' }}
+                        />
+                    </Link>
 
                     <div style={{ display: 'flex', gap: '20px' }}>
                         <Link

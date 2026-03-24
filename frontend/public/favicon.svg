@@ -1,0 +1,17 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="specflowFav" x1="18" y1="98" x2="104" y2="22" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0E3F88"/>
+      <stop offset="0.52" stop-color="#1689B9"/>
+      <stop offset="1" stop-color="#29D0C3"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="#F7FBFF"/>
+  <path d="M18 95C33 79 47 66 58 55C68 44 81 32 102 24L95 42L111 41L100 15L74 27C86 31 92 36 92 43C81 46 71 53 62 63C49 76 35 87 18 95Z" fill="url(#specflowFav)"/>
+  <path d="M36 35H60L74 49V67" stroke="url(#specflowFav)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M60 35V49H74" stroke="url(#specflowFav)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="43" cy="90" r="8" stroke="#0E3F88" stroke-width="6"/>
+  <circle cx="63" cy="72" r="8" stroke="#1689B9" stroke-width="6"/>
+  <circle cx="86" cy="77" r="8" stroke="#29D0C3" stroke-width="6"/>
+  <path d="M49 84L57 78L69 80L79 74" stroke="url(#specflowFav)" stroke-width="6" stroke-linecap="round"/>
+</svg>

@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { UserPlus } from 'lucide-react';
+
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
 
 const Register: React.FC = () => {
     const { register, isAuthenticated } = useAuth();
@@ -9,17 +11,26 @@ const Register: React.FC = () => {
         username: '',
         email: '',
         password: '',
-        role: 'ANALYST' as 'ADMIN' | 'ANALYST' | 'USER',
+        confirmPassword: '',
     });
     const [isLoading, setIsLoading] = useState(false);
+
+    const passwordIsStrong = useMemo(
+        () => passwordRegex.test(formData.password),
+        [formData.password]
+    );
+    const passwordsMatch = useMemo(
+        () => formData.password === formData.confirmPassword,
+        [formData.password, formData.confirmPassword]
+    );
 
     if (isAuthenticated) {
         return <Navigate to="/" replace />;
     }
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
+        setFormData((prev) => ({
             ...prev,
             [name]: value,
         }));
@@ -27,12 +38,23 @@ const Register: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!passwordIsStrong) {
+            return;
+        }
+
+        if (!passwordsMatch) {
+            return;
+        }
+
         setIsLoading(true);
 
         try {
-            await register(formData);
-        } catch (error) {
-            // Erro já tratado no contexto
+            await register({
+                username: formData.username.trim(),
+                email: formData.email.trim().toLowerCase(),
+                password: formData.password,
+            });
         } finally {
             setIsLoading(false);
         }
@@ -45,12 +67,12 @@ const Register: React.FC = () => {
             alignItems: 'center',
             minHeight: '80vh'
         }}>
-            <div className="card" style={{ width: '100%', maxWidth: '400px' }}>
+            <div className="card" style={{ width: '100%', maxWidth: '460px' }}>
                 <div className="card-header" style={{ textAlign: 'center' }}>
                     <UserPlus size={32} style={{ marginBottom: '10px', color: '#007bff' }} />
-                    <h2 style={{ margin: 0 }}>Cadastro</h2>
+                    <h2 style={{ margin: 0 }}>Criar conta</h2>
                     <p style={{ margin: '5px 0 0 0', color: '#666' }}>
-                        Crie sua conta
+                        Cadastro real com senha forte e acesso padrão de analista
                     </p>
                 </div>
 
@@ -58,7 +80,7 @@ const Register: React.FC = () => {
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">
                             <label className="form-label" htmlFor="username">
-                                Nome de Usuário (Analista Técnico)
+                                Nome do usuario
                             </label>
                             <input
                                 type="text"
@@ -69,7 +91,8 @@ const Register: React.FC = () => {
                                 onChange={handleChange}
                                 required
                                 disabled={isLoading}
-                                placeholder="João Silva"
+                                autoComplete="username"
+                                placeholder="Joao Silva"
                             />
                         </div>
 
@@ -86,6 +109,7 @@ const Register: React.FC = () => {
                                 onChange={handleChange}
                                 required
                                 disabled={isLoading}
+                                autoComplete="email"
                             />
                         </div>
 
@@ -102,33 +126,39 @@ const Register: React.FC = () => {
                                 onChange={handleChange}
                                 required
                                 disabled={isLoading}
-                                placeholder="Mínimo 6 caracteres"
+                                autoComplete="new-password"
+                                placeholder="Minimo 8 caracteres"
                             />
+                            <small style={{ color: passwordIsStrong ? '#1f7a1f' : '#666' }}>
+                                Use 8+ caracteres com maiuscula, minuscula, numero e simbolo.
+                            </small>
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label" htmlFor="role">
-                                Função
+                            <label className="form-label" htmlFor="confirmPassword">
+                                Confirmar senha
                             </label>
-                            <select
-                                id="role"
-                                name="role"
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                name="confirmPassword"
                                 className="form-input"
-                                value={formData.role}
+                                value={formData.confirmPassword}
                                 onChange={handleChange}
+                                required
                                 disabled={isLoading}
-                            >
-                                <option value="ANALYST">Analista Técnico</option>
-                                <option value="USER">Usuário</option>
-                                <option value="ADMIN">Administrador</option>
-                            </select>
+                                autoComplete="new-password"
+                            />
+                            {formData.confirmPassword && !passwordsMatch && (
+                                <small style={{ color: '#c62828' }}>As senhas precisam ser iguais.</small>
+                            )}
                         </div>
 
                         <button
                             type="submit"
                             className="btn btn-primary"
                             style={{ width: '100%', marginBottom: '15px' }}
-                            disabled={isLoading}
+                            disabled={isLoading || !passwordIsStrong || !passwordsMatch}
                         >
                             {isLoading ? 'Cadastrando...' : 'Cadastrar'}
                         </button>
@@ -136,9 +166,9 @@ const Register: React.FC = () => {
 
                     <div style={{ textAlign: 'center' }}>
                         <p style={{ margin: 0, color: '#666' }}>
-                            Já tem uma conta?{' '}
+                            Ja tem uma conta?{' '}
                             <Link to="/login" style={{ color: '#007bff' }}>
-                                Faça login
+                                Faca login
                             </Link>
                         </p>
                     </div>

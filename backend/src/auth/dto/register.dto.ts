@@ -1,8 +1,10 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength, IsOptional, IsEnum } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { PASSWORD_MESSAGE, PASSWORD_MIN_LENGTH, PASSWORD_REGEX } from '../password-policy';
 
 export class RegisterDto {
     @IsString()
     @IsNotEmpty()
+    @MaxLength(80)
     username: string;
 
     @IsEmail()
@@ -10,10 +12,7 @@ export class RegisterDto {
     email: string;
 
     @IsString()
-    @MinLength(6)
+    @MinLength(PASSWORD_MIN_LENGTH)
+    @Matches(PASSWORD_REGEX, { message: PASSWORD_MESSAGE })
     password: string;
-
-    @IsOptional()
-    @IsEnum(['ADMIN', 'ANALYST', 'USER'])
-    role?: 'ADMIN' | 'ANALYST' | 'USER';
 }

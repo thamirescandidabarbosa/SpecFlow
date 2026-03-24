@@ -1,5 +1,5 @@
-import api from './api';
-import { LoginRequest, RegisterRequest, AuthResponse } from '../types';
+import api, { getBaseURL } from './api';
+import { LoginRequest, RegisterRequest, AuthResponse, User } from '../types';
 
 export const authService = {
     async login(credentials: LoginRequest): Promise<AuthResponse> {
@@ -12,6 +12,15 @@ export const authService = {
         return response.data;
     },
 
+    async fetchCurrentUser(): Promise<User> {
+        const response = await api.get('/auth/me');
+        return response.data;
+    },
+
+    startGoogleLogin() {
+        window.location.href = `${getBaseURL()}/auth/google`;
+    },
+
     logout() {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
@@ -22,8 +31,7 @@ export const authService = {
             const user = localStorage.getItem('user');
             return user ? JSON.parse(user) : null;
         } catch (error) {
-            // Se houver erro no JSON, limpa o localStorage e retorna null
-            console.warn('Dados inválidos no localStorage, limpando...', error);
+            console.warn('Dados invalidos no localStorage, limpando...', error);
             localStorage.removeItem('user');
             localStorage.removeItem('token');
             return null;

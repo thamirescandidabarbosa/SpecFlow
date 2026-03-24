@@ -16,7 +16,6 @@ export interface RegisterRequest {
     username: string;
     email: string;
     password: string;
-    role?: 'ADMIN' | 'ANALYST' | 'USER';
 }
 
 export interface AuthResponse {
@@ -62,7 +61,6 @@ export interface FileUpload {
     document?: Document;
 }
 
-// Novos tipos para Especificação Funcional
 export interface FunctionalRequest {
     id: string;
     description: string;
@@ -103,7 +101,6 @@ export interface FunctionalSpecification {
     endDateTime?: string;
     unitTests?: FileUpload[];
     includeCutoverPlan: boolean;
-    // Propriedades do cutover plan (estrutura achatada no backend)
     cutoverObjective?: string;
     cutoverTimeline?: string;
     cutoverDetailedActivities?: string;
@@ -113,7 +110,6 @@ export interface FunctionalSpecification {
     cutoverContingencyPlan?: string;
     cutoverSuccessCriteria?: string;
     cutoverPostGoLiveSupport?: string;
-
     authorId: string;
     createdAt: string;
     updatedAt: string;
@@ -138,7 +134,6 @@ export interface CreateFunctionalSpecificationRequest {
     startDateTime: string;
     endDateTime?: string;
     includeCutoverPlan: boolean;
-    // Propriedades do cutover plan (estrutura achatada)
     cutoverObjective?: string;
     cutoverTimeline?: string;
     cutoverDetailedActivities?: string;

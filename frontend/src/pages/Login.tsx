@@ -1,15 +1,19 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { LogIn } from 'lucide-react';
 
 const Login: React.FC = () => {
-    const { login, isAuthenticated } = useAuth();
+    const { login, loginWithGoogle, isAuthenticated } = useAuth();
     const [formData, setFormData] = useState({
         email: '',
         password: '',
     });
     const [isLoading, setIsLoading] = useState(false);
+    const googleEnabled = useMemo(
+        () => process.env.REACT_APP_ENABLE_GOOGLE_AUTH === 'true',
+        []
+    );
 
     if (isAuthenticated) {
         return <Navigate to="/" replace />;
@@ -17,7 +21,7 @@ const Login: React.FC = () => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
+        setFormData((prev) => ({
             ...prev,
             [name]: value,
         }));
@@ -28,9 +32,10 @@ const Login: React.FC = () => {
         setIsLoading(true);
 
         try {
-            await login(formData);
-        } catch (error) {
-            // Erro já tratado no contexto
+            await login({
+                email: formData.email.trim().toLowerCase(),
+                password: formData.password,
+            });
         } finally {
             setIsLoading(false);
         }
@@ -43,12 +48,12 @@ const Login: React.FC = () => {
             alignItems: 'center',
             minHeight: '80vh'
         }}>
-            <div className="card" style={{ width: '100%', maxWidth: '400px' }}>
+            <div className="card" style={{ width: '100%', maxWidth: '420px' }}>
                 <div className="card-header" style={{ textAlign: 'center' }}>
                     <LogIn size={32} style={{ marginBottom: '10px', color: '#007bff' }} />
-                    <h2 style={{ margin: 0 }}>Login</h2>
+                    <h2 style={{ margin: 0 }}>Login seguro</h2>
                     <p style={{ margin: '5px 0 0 0', color: '#666' }}>
-                        Entre com suas credenciais
+                        Entre com email e senha ou use sua conta Google
                     </p>
                 </div>
 
@@ -66,6 +71,7 @@ const Login: React.FC = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
+                                autoComplete="email"
                                 disabled={isLoading}
                             />
                         </div>
@@ -82,6 +88,7 @@ const Login: React.FC = () => {
                                 value={formData.password}
                                 onChange={handleChange}
                                 required
+                                autoComplete="current-password"
                                 disabled={isLoading}
                             />
                         </div>
@@ -89,16 +96,28 @@ const Login: React.FC = () => {
                         <button
                             type="submit"
                             className="btn btn-primary"
-                            style={{ width: '100%', marginBottom: '15px' }}
+                            style={{ width: '100%', marginBottom: googleEnabled ? '12px' : '15px' }}
                             disabled={isLoading}
                         >
                             {isLoading ? 'Entrando...' : 'Entrar'}
                         </button>
                     </form>
 
+                    {googleEnabled && (
+                        <button
+                            type="button"
+                            className="btn btn-secondary"
+                            style={{ width: '100%', marginBottom: '15px' }}
+                            onClick={loginWithGoogle}
+                            disabled={isLoading}
+                        >
+                            Continuar com Google
+                        </button>
+                    )}
+
                     <div style={{ textAlign: 'center' }}>
                         <p style={{ margin: 0, color: '#666' }}>
-                            Não tem uma conta?{' '}
+                            Nao tem uma conta?{' '}
                             <Link to="/register" style={{ color: '#007bff' }}>
                                 Cadastre-se
                             </Link>

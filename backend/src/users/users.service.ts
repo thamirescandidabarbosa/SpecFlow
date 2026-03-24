@@ -1,30 +1,34 @@
 import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { RegisterDto } from '../auth/dto/register.dto';
 import { UpdateUserProfileDto, ChangePasswordDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcryptjs';
+
+interface CreateUserInput {
+    username: string;
+    email: string;
+    password: string;
+    role?: 'ADMIN' | 'ANALYST' | 'USER';
+}
 
 @Injectable()
 export class UsersService {
     constructor(private prisma: PrismaService) { }
 
-    async create(userData: RegisterDto) {
-        // Verificar se o email já existe
+    async create(userData: CreateUserInput) {
         const existingUser = await this.prisma.user.findUnique({
             where: { email: userData.email },
         });
 
         if (existingUser) {
-            throw new ConflictException('Email já está em uso');
+            throw new ConflictException('Email ja esta em uso');
         }
 
-        // Verificar se o username já existe
         const existingUsername = await this.prisma.user.findUnique({
             where: { username: userData.username },
         });
 
         if (existingUsername) {
-            throw new ConflictException('Nome de usuário já está em uso');
+            throw new ConflictException('Nome de usuario ja esta em uso');
         }
 
         const user = await this.prisma.user.create({
@@ -36,7 +40,6 @@ export class UsersService {
             },
         });
 
-        // Remover senha do retorno
         const { password, ...result } = user;
         return result;
     }
@@ -44,6 +47,12 @@ export class UsersService {
     async findByEmail(email: string) {
         return this.prisma.user.findUnique({
             where: { email },
+        });
+    }
+
+    async findByUsername(username: string) {
+        return this.prisma.user.findUnique({
+            where: { username },
         });
     }
 
@@ -81,7 +90,7 @@ export class UsersService {
         });
 
         if (!user) {
-            throw new NotFoundException('Usuário não encontrado');
+            throw new NotFoundException('Usuario nao encontrado');
         }
 
         return user;
@@ -90,25 +99,23 @@ export class UsersService {
     async updateProfile(id: string, updateData: UpdateUserProfileDto) {
         const user = await this.findOne(id);
 
-        // Verificar se o email já está em uso por outro usuário
         if (updateData.email && updateData.email !== user.email) {
             const existingUser = await this.prisma.user.findUnique({
                 where: { email: updateData.email },
             });
 
             if (existingUser && existingUser.id !== id) {
-                throw new ConflictException('Email já está em uso por outro usuário');
+                throw new ConflictException('Email ja esta em uso por outro usuario');
             }
         }
 
-        // Verificar se o username já está em uso por outro usuário
         if (updateData.username && updateData.username !== user.username) {
             const existingUsername = await this.prisma.user.findUnique({
                 where: { username: updateData.username },
             });
 
             if (existingUsername && existingUsername.id !== id) {
-                throw new ConflictException('Nome de usuário já está em uso por outro usuário');
+                throw new ConflictException('Nome de usuario ja esta em uso por outro usuario');
             }
         }
 
@@ -117,7 +124,6 @@ export class UsersService {
             data: updateData,
         });
 
-        // Remover senha do retorno
         const { password, ...result } = updatedUser;
         return result;
     }
@@ -125,7 +131,6 @@ export class UsersService {
     async changePassword(id: string, changePasswordData: ChangePasswordDto) {
         const user = await this.findOne(id);
 
-        // Verificar se a senha atual está correta
         const isCurrentPasswordValid = await bcrypt.compare(
             changePasswordData.currentPassword,
             user.password
@@ -135,8 +140,7 @@ export class UsersService {
             throw new BadRequestException('Senha atual incorreta');
         }
 
-        // Hash da nova senha
-        const hashedNewPassword = await bcrypt.hash(changePasswordData.newPassword, 10);
+        const hashedNewPassword = await bcrypt.hash(changePasswordData.newPassword, 12);
 
         await this.prisma.user.update({
             where: { id },
