@@ -3,6 +3,11 @@ import { LoginRequest, RegisterRequest, AuthResponse, User } from '../types';
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+interface GoogleStatusResponse {
+    enabled: boolean;
+    loginUrl: string;
+}
+
 export const authService = {
     async login(credentials: LoginRequest): Promise<AuthResponse> {
         const response = await api.post('/auth/login', credentials);
@@ -19,7 +24,18 @@ export const authService = {
         return response.data;
     },
 
+    async getGoogleStatus(): Promise<GoogleStatusResponse> {
+        const response = await api.get('/auth/google/status');
+        return response.data;
+    },
+
     async startGoogleLogin() {
+        const googleStatus = await this.getGoogleStatus();
+
+        if (!googleStatus.enabled) {
+            throw new Error('Login com Google ainda nao esta configurado no backend.');
+        }
+
         const healthUrl = `${getBaseURL()}/health`;
 
         for (let attempt = 0; attempt < 6; attempt += 1) {
@@ -41,7 +57,7 @@ export const authService = {
             await wait(5000);
         }
 
-        window.location.assign(`${getBaseURL()}/auth/google`);
+        window.location.assign(`${getBaseURL()}${googleStatus.loginUrl}`);
     },
 
     logout() {

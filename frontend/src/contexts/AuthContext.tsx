@@ -94,7 +94,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     const loginWithGoogle = async () => {
-        await authService.startGoogleLogin();
+        try {
+            await authService.startGoogleLogin();
+        } catch (error: any) {
+            const message =
+                error.response?.data?.message ||
+                error.message ||
+                'Nao foi possivel iniciar o login com Google';
+            toast.error(message, { autoClose: 5000 });
+            throw error;
+        }
     };
 
     const logout = () => {

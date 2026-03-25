@@ -6,6 +6,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 import { GoogleAuthGuard } from './google-auth.guard';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
+import { Public } from './public.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -15,12 +16,14 @@ export class AuthController {
     ) { }
 
     @Post('login')
+    @Public()
     @HttpCode(HttpStatus.OK)
     async login(@Body() loginDto: LoginDto) {
         return this.authService.login(loginDto);
     }
 
     @Post('register')
+    @Public()
     async register(@Body() registerDto: RegisterDto) {
         return this.authService.register(registerDto);
     }
@@ -31,13 +34,27 @@ export class AuthController {
         return req.user;
     }
 
+    @Get('google/status')
+    @Public()
+    getGoogleStatus() {
+        const clientId = this.configService.get<string>('GOOGLE_CLIENT_ID');
+        const clientSecret = this.configService.get<string>('GOOGLE_CLIENT_SECRET');
+
+        return {
+            enabled: Boolean(clientId && clientSecret),
+            loginUrl: '/auth/google',
+        };
+    }
+
     @Get('google')
+    @Public()
     @UseGuards(GoogleAuthGuard)
     async googleAuth() {
         return;
     }
 
     @Get('google/callback')
+    @Public()
     @UseGuards(GoogleAuthGuard)
     async googleAuthCallback(@Request() req, @Res() res: Response) {
         const frontendUrl =
@@ -46,6 +63,11 @@ export class AuthController {
         redirectUrl.pathname = `${redirectUrl.pathname.replace(/\/$/, '')}/auth/callback`;
         redirectUrl.search = '';
         redirectUrl.hash = '';
+
+        if (!req.user?.access_token || !req.user?.user) {
+            redirectUrl.searchParams.set('error', 'google_auth_failed');
+            return res.redirect(redirectUrl.toString());
+        }
 
         redirectUrl.searchParams.set('token', req.user.access_token);
         redirectUrl.searchParams.set('user', JSON.stringify(req.user.user));

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { toast } from 'react-toastify';
 
 const AuthCallback: React.FC = () => {
     const location = useLocation();
@@ -11,6 +12,13 @@ const AuthCallback: React.FC = () => {
         const params = new URLSearchParams(location.search);
         const token = params.get('token');
         const user = params.get('user');
+        const error = params.get('error');
+
+        if (error) {
+            toast.error('Nao foi possivel concluir o login com Google.', { autoClose: 5000 });
+            navigate('/login', { replace: true });
+            return;
+        }
 
         if (!token || !user) {
             navigate('/login', { replace: true });

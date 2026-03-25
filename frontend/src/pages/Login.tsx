@@ -9,11 +9,13 @@ const Login: React.FC = () => {
         email: '',
         password: '',
     });
-    const [isLoading, setIsLoading] = useState(false);
+    const [isFormLoading, setIsFormLoading] = useState(false);
+    const [isGoogleLoading, setIsGoogleLoading] = useState(false);
     const googleEnabled = useMemo(
         () => process.env.REACT_APP_ENABLE_GOOGLE_AUTH === 'true',
         []
     );
+    const isBusy = isFormLoading || isGoogleLoading;
 
     if (isAuthenticated) {
         return <Navigate to="/" replace />;
@@ -29,7 +31,7 @@ const Login: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsLoading(true);
+        setIsFormLoading(true);
 
         try {
             await login({
@@ -37,17 +39,17 @@ const Login: React.FC = () => {
                 password: formData.password,
             });
         } finally {
-            setIsLoading(false);
+            setIsFormLoading(false);
         }
     };
 
     const handleGoogleLogin = async () => {
-        setIsLoading(true);
+        setIsGoogleLoading(true);
 
         try {
             await loginWithGoogle();
         } finally {
-            setIsLoading(false);
+            setIsGoogleLoading(false);
         }
     };
 
@@ -82,7 +84,7 @@ const Login: React.FC = () => {
                                 onChange={handleChange}
                                 required
                                 autoComplete="email"
-                                disabled={isLoading}
+                                disabled={isBusy}
                             />
                         </div>
 
@@ -99,7 +101,7 @@ const Login: React.FC = () => {
                                 onChange={handleChange}
                                 required
                                 autoComplete="current-password"
-                                disabled={isLoading}
+                                disabled={isBusy}
                             />
                         </div>
 
@@ -107,9 +109,9 @@ const Login: React.FC = () => {
                             type="submit"
                             className="btn btn-primary"
                             style={{ width: '100%', marginBottom: googleEnabled ? '12px' : '15px' }}
-                            disabled={isLoading}
+                            disabled={isBusy}
                         >
-                            {isLoading ? 'Entrando...' : 'Entrar'}
+                            {isFormLoading ? 'Entrando...' : 'Entrar'}
                         </button>
                     </form>
 
@@ -119,9 +121,9 @@ const Login: React.FC = () => {
                             className="btn btn-secondary"
                             style={{ width: '100%', marginBottom: '15px' }}
                             onClick={handleGoogleLogin}
-                            disabled={isLoading}
+                            disabled={isBusy}
                         >
-                            {isLoading ? 'Conectando ao Google...' : 'Continuar com Google'}
+                            {isGoogleLoading ? 'Conectando ao Google...' : 'Continuar com Google'}
                         </button>
                     )}
 
