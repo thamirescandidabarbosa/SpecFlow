@@ -38,6 +38,8 @@ const Login: React.FC = () => {
                 email: formData.email.trim().toLowerCase(),
                 password: formData.password,
             });
+        } catch (error) {
+            console.error('Erro ao fazer login:', error);
         } finally {
             setIsFormLoading(false);
         }
@@ -48,6 +50,8 @@ const Login: React.FC = () => {
 
         try {
             await loginWithGoogle();
+        } catch (error) {
+            console.error('Erro ao iniciar login com Google:', error);
         } finally {
             setIsGoogleLoading(false);
         }

@@ -55,6 +55,8 @@ const Register: React.FC = () => {
                 email: formData.email.trim().toLowerCase(),
                 password: formData.password,
             });
+        } catch (error) {
+            console.error('Erro ao fazer cadastro:', error);
         } finally {
             setIsLoading(false);
         }

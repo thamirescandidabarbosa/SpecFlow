@@ -27,6 +27,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const applyAuth = useCallback((authData: { access_token: string; user: User }) => {
         authService.storeAuth(authData);
         setUser(authData.user);
+        setLoading(false);
     }, []);
 
     useEffect(() => {
@@ -109,6 +110,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const logout = () => {
         authService.logout();
         setUser(null);
+        setLoading(false);
         toast.info('Logout realizado com sucesso!', { autoClose: 5000 });
     };
 

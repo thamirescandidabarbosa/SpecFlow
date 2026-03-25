@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { LogOut, FileText, Upload, Home, User, Plus, Settings, ChevronDown } from 'lucide-react';
+import { withAppBasePath } from '../utils/runtimeBase';
 
 const Navbar: React.FC = () => {
     const { user, logout, isAuthenticated } = useAuth();
@@ -73,7 +74,7 @@ const Navbar: React.FC = () => {
                         }}
                     >
                         <img
-                            src={`${process.env.PUBLIC_URL}/logoSpecFlow.png`}
+                            src={withAppBasePath('/logoSpecFlow.png')}
                             alt="SpecFlow"
                             style={{ height: '42px', width: 'auto', display: 'block' }}
                         />

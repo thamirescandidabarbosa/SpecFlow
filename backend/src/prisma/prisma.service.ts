@@ -47,6 +47,9 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
 
             parsed.hostname = `db.${projectRef}.supabase.co`;
             parsed.port = '5432';
+            if (parsed.username.includes('.')) {
+                parsed.username = parsed.username.split('.')[0];
+            }
             return PrismaService.ensureSupabaseSsl(parsed.toString());
         } catch {
             return PrismaService.ensureSupabaseSsl(candidate);

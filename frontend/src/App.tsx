@@ -17,6 +17,7 @@ import FunctionalSpecificationList from './pages/FunctionalSpecificationList';
 import FunctionalSpecificationEdit from './pages/FunctionalSpecificationEdit';
 import FunctionalSpecificationView from './pages/FunctionalSpecificationView';
 import UserSettings from './pages/UserSettings';
+import { getAppBasePath } from './utils/runtimeBase';
 
 const queryClient = new QueryClient();
 
@@ -24,7 +25,7 @@ function App() {
     return (
         <QueryClientProvider client={queryClient}>
             <AuthProvider>
-                <Router basename={process.env.PUBLIC_URL}>
+                <Router basename={getAppBasePath()}>
                     <div className="App">
                         <Navbar />
                         <main className="container" style={{ marginTop: '20px' }}>
