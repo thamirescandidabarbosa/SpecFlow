@@ -1,6 +1,8 @@
 import api, { getBaseURL } from './api';
 import { LoginRequest, RegisterRequest, AuthResponse, User } from '../types';
 
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export const authService = {
     async login(credentials: LoginRequest): Promise<AuthResponse> {
         const response = await api.post('/auth/login', credentials);
@@ -17,8 +19,29 @@ export const authService = {
         return response.data;
     },
 
-    startGoogleLogin() {
-        window.location.href = `${getBaseURL()}/auth/google`;
+    async startGoogleLogin() {
+        const healthUrl = `${getBaseURL()}/health`;
+
+        for (let attempt = 0; attempt < 6; attempt += 1) {
+            try {
+                const response = await fetch(healthUrl, {
+                    method: 'GET',
+                    cache: 'no-store',
+                });
+
+                if (response.ok) {
+                    break;
+                }
+            } catch (error) {
+                if (attempt === 5) {
+                    console.warn('Nao foi possivel aquecer o backend antes do login Google.', error);
+                }
+            }
+
+            await wait(5000);
+        }
+
+        window.location.assign(`${getBaseURL()}/auth/google`);
     },
 
     logout() {

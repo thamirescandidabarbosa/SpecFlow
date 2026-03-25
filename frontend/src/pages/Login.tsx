@@ -41,6 +41,16 @@ const Login: React.FC = () => {
         }
     };
 
+    const handleGoogleLogin = async () => {
+        setIsLoading(true);
+
+        try {
+            await loginWithGoogle();
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div style={{
             display: 'flex',
@@ -108,10 +118,10 @@ const Login: React.FC = () => {
                             type="button"
                             className="btn btn-secondary"
                             style={{ width: '100%', marginBottom: '15px' }}
-                            onClick={loginWithGoogle}
+                            onClick={handleGoogleLogin}
                             disabled={isLoading}
                         >
-                            Continuar com Google
+                            {isLoading ? 'Conectando ao Google...' : 'Continuar com Google'}
                         </button>
                     )}
 

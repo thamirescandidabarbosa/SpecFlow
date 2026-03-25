@@ -9,7 +9,7 @@ interface AuthContextType {
     login: (credentials: LoginRequest) => Promise<void>;
     register: (userData: RegisterRequest) => Promise<void>;
     completeSocialLogin: (token: string, userJson: string) => Promise<void>;
-    loginWithGoogle: () => void;
+    loginWithGoogle: () => Promise<void>;
     logout: () => void;
     isAuthenticated: boolean;
 }
@@ -93,8 +93,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         toast.success('Login com Google realizado com sucesso!', { autoClose: 5000 });
     };
 
-    const loginWithGoogle = () => {
-        authService.startGoogleLogin();
+    const loginWithGoogle = async () => {
+        await authService.startGoogleLogin();
     };
 
     const logout = () => {

@@ -42,7 +42,10 @@ export class AuthController {
     async googleAuthCallback(@Request() req, @Res() res: Response) {
         const frontendUrl =
             this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
-        const redirectUrl = new URL('/auth/callback', frontendUrl);
+        const redirectUrl = new URL(frontendUrl);
+        redirectUrl.pathname = `${redirectUrl.pathname.replace(/\/$/, '')}/auth/callback`;
+        redirectUrl.search = '';
+        redirectUrl.hash = '';
 
         redirectUrl.searchParams.set('token', req.user.access_token);
         redirectUrl.searchParams.set('user', JSON.stringify(req.user.user));
