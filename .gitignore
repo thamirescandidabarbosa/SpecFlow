@@ -59,3 +59,5 @@ Thumbs.db
 # Arquivos gerados
 .vercel
 .now
+.deploy-gh-pages/
+supabase/.temp/

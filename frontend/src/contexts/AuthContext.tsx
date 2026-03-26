@@ -41,7 +41,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             }
 
             try {
-                const currentUser = await authService.fetchCurrentUser();
+                const currentUser = await Promise.race([
+                    authService.fetchCurrentUser(),
+                    new Promise<never>((_, reject) =>
+                        setTimeout(() => reject(new Error('Tempo esgotado ao validar sessao')), 8000)
+                    ),
+                ]);
                 setUser(currentUser);
                 authService.storeAuth({
                     access_token: storedToken,
