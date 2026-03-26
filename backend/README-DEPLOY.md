@@ -26,7 +26,7 @@ SUPABASE_ANON_KEY="your-anon-key"
 2. Crie um bucket chamado `uploads`
 3. Configure as permissões conforme necessário
 
-## Deploy no Railway
+## Deploy no Render
 
 ### 1. Preparar o projeto
 ```bash
@@ -35,14 +35,20 @@ npm run build
 ```
 
 ### 2. Deploy
-1. Acesse [https://railway.app/](https://railway.app/)
+1. Acesse [https://render.com/](https://render.com/)
 2. Conecte seu repositório GitHub
-3. Configure as variáveis de ambiente no Railway:
+3. Configure as variáveis de ambiente no Render:
    - `DATABASE_URL`
+   - `DIRECT_URL`
    - `SUPABASE_URL`
    - `SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
    - `JWT_SECRET`
+   - `JWT_EXPIRES_IN`
+   - `FRONTEND_URL`
+   - `CORS_ORIGIN`
    - `NODE_ENV=production`
+   - `PORT=10000`
 
 ### 3. Executar migrações
 ```bash

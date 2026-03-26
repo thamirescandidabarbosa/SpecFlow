@@ -46,7 +46,7 @@ async function bootstrap() {
 
     app.setGlobalPrefix('api');
 
-    const port = process.env.PORT || process.env.RAILWAY_PORT || 3001;
+    const port = process.env.PORT || 3001;
     const host = process.env.HOST || '0.0.0.0';
 
     console.log(`Iniciando servidor na porta ${port}...`);

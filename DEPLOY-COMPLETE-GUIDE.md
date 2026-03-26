@@ -1,7 +1,7 @@
 # 🚀 Deploy Guide - SpecFlow Full Stack
 
-## ✅ Frontend - SURGE (Já configurado!)
-**URL:** https://specflow-app.surge.sh
+## ✅ Frontend - GitHub Pages
+**URL:** https://thamirescandidabarbosa.github.io/SpecFlow/
 
 ### Comandos:
 ```bash
@@ -9,31 +9,37 @@ cd fullstack-project/frontend
 npm run deploy  # Deploy automático
 ```
 
-## 🔄 Backend - RAILWAY (Recomendado)
+## 🔄 Backend - RENDER
 
-### 1. Setup Railway
-1. Acesse: https://railway.app/
+### 1. Setup Render
+1. Acesse: https://render.com/
 2. Conecte GitHub
 3. New Project → Deploy from GitHub
-4. Selecione: `fullstack-project/backend`
+4. Selecione o repositório `SpecFlow`
+5. Root Directory: `backend`
 
-### 2. Variáveis de Ambiente (Railway)
+### 2. Variáveis de Ambiente (Render)
 ```env
 DATABASE_URL=postgresql://...
+DIRECT_URL=postgresql://...
 SUPABASE_URL=https://your-project.supabase.co  
 SUPABASE_ANON_KEY=your-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 JWT_SECRET=your-secret
+JWT_EXPIRES_IN=7d
+FRONTEND_URL=https://thamirescandidabarbosa.github.io/SpecFlow
+CORS_ORIGIN=https://thamirescandidabarbosa.github.io
 NODE_ENV=production
-PORT=3001
+PORT=10000
 ```
 
 ### 3. Após deploy do backend:
-1. Copie a URL do Railway (ex: `https://specflow-backend.railway.app`)
+1. Copie a URL do Render (ex: `https://specflow.onrender.com`)
 2. Atualize no frontend:
 
 ```typescript
 // frontend/.env.production
-REACT_APP_API_URL=https://SUA-URL-RAILWAY.railway.app
+REACT_APP_API_URL=https://specflow.onrender.com/api
 ```
 
 3. Redeploy frontend:
@@ -51,11 +57,11 @@ npm run deploy
 ## 📁 Estrutura de Deploy
 
 ```
-Frontend (Surge)          Backend (Railway)         Database (Supabase)
+Frontend (GitHub Pages)   Backend (Render)          Database (Supabase)
 ┌─────────────────┐       ┌──────────────────┐      ┌─────────────────┐
 │ React App       │────→  │ NestJS API       │────→ │ PostgreSQL      │
-│ specflow-app    │       │ Node.js Server   │      │ + Storage       │
-│ .surge.sh       │       │ .railway.app     │      │ .supabase.co    │
+│ github.io       │       │ .onrender.com    │      │ + Storage       │
+│ /SpecFlow       │       │ specflow         │      │ .supabase.co    │
 └─────────────────┘       └──────────────────┘      └─────────────────┘
 ```
 
@@ -80,8 +86,8 @@ Frontend (Surge)          Backend (Railway)         Database (Supabase)
 
 ## 🌐 URLs Finais
 
-- **Frontend:** https://specflow-app.surge.sh
-- **Backend:** https://[seu-projeto].railway.app
+- **Frontend:** https://thamirescandidabarbosa.github.io/SpecFlow/
+- **Backend:** https://specflow.onrender.com
 - **Database:** https://[seu-projeto].supabase.co
 
 ---

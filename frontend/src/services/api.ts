@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const defaultProductionApiUrl = 'https://specflow-backend.railway.app/api';
+const defaultProductionApiUrl = 'https://specflow.onrender.com/api';
 
 export const getBaseURL = () => {
     if (process.env.NODE_ENV === 'development') {

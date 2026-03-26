@@ -1,80 +1,34 @@
-# 🚨 CORREÇÃO URGENTE - CORS ERROR Railway
+# Correcao de CORS - Render
 
-## ❌ PROBLEMA IDENTIFICADO
+## Problema
 
-O backend no Railway está retornando:
-```
-Access-Control-Allow-Origin: https://railway.com
-```
+Se o frontend em `https://thamirescandidabarbosa.github.io/SpecFlow` nao conseguir falar com o backend, normalmente falta alinhar `CORS_ORIGIN` no Render.
 
-Mas deveria retornar:
-```
-Access-Control-Allow-Origin: https://specflow-app.surge.sh
-```
+## Configuracao correta
 
-## 🔧 SOLUÇÕES
+No painel do Render, configure:
 
-### SOLUÇÃO 1: Configurar Variável CORS_ORIGIN no Railway
-
-1. **Acesse Railway Dashboard**: https://railway.app
-2. **Vá para seu projeto**: specflow-backend
-3. **Settings → Variables**
-4. **Adicione/Edite:**
-   ```
-   CORS_ORIGIN=https://specflow-app.surge.sh
-   ```
-5. **Redeploy**: Click em "Deploy"
-
-### SOLUÇÃO 2: Verificar Todas as Variáveis
-
-Confirme que estas variáveis estão configuradas:
 ```env
-CORS_ORIGIN=https://specflow-app.surge.sh
+CORS_ORIGIN=https://thamirescandidabarbosa.github.io
+FRONTEND_URL=https://thamirescandidabarbosa.github.io/SpecFlow
 NODE_ENV=production
-PORT=3001
-JWT_SECRET=specflow-super-secret-jwt-key-2025
-JWT_EXPIRES_IN=7d
-DATABASE_URL=file:./prod.db
+PORT=10000
 ```
 
-### SOLUÇÃO 3: Force Redeploy
+## Teste rapido
 
-Se as variáveis estão corretas:
-1. No Railway Dashboard
-2. **Deployments → Latest**
-3. **Three dots (⋯) → Redeploy**
+Depois do redeploy, teste:
 
-## 🧪 TESTE RÁPIDO
-
-Depois da correção, teste:
-```bash
-curl -H "Origin: https://specflow-app.surge.sh" \
-     -H "Access-Control-Request-Method: POST" \
-     -H "Access-Control-Request-Headers: Content-Type" \
-     -X OPTIONS \
-     https://specflow-backend.railway.app/api/auth/register
+```powershell
+Invoke-WebRequest -UseBasicParsing https://specflow.onrender.com/api/health
 ```
 
-**Resposta esperada:**
+Resposta esperada:
+
+```json
+{"status":"ok"}
 ```
-Access-Control-Allow-Origin: https://specflow-app.surge.sh
-```
 
-## 🔄 CÓDIGO ATUALIZADO
+## Observacao
 
-Já atualizei `src/main.ts` com CORS mais robusto que:
-- ✅ Lê `CORS_ORIGIN` da variável de ambiente
-- ✅ Faz log da configuração
-- ✅ Bloqueia origins não permitidas
-- ✅ Inclui headers necessários
-
-## ⏱️ TEMPO DE CORREÇÃO
-
-- **Configure variável**: 1 minuto
-- **Redeploy**: 3-5 minutos
-- **Teste**: 1 minuto
-- **Total**: ~5 minutos
-
-## 🎯 PRÓXIMO PASSO
-
-Após corrigir o CORS, o frontend conectará automaticamente com o backend! 🚀
+O backend atual usa Render como unica referencia de producao. Railway nao faz mais parte do fluxo oficial.
