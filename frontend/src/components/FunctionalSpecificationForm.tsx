@@ -606,7 +606,7 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
     };
 
     // Função para baixar arquivo com tratamento de erro
-    const handleDownloadFile = async (fileId: string, fileName: string) => {
+    const _handleDownloadFile = async (fileId: string, fileName: string) => {
         try {
             // Mostrar toast informativo de início do download
             const downloadToast = toast.loading(`Preparando download de "${fileName}"...`, {
