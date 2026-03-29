@@ -261,6 +261,7 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
             setIsSubmitting(false);
         }
     };
+    void _handleDownloadFile;
 
     const handleCreateSubmit = async (data: FormData) => {
         try {
