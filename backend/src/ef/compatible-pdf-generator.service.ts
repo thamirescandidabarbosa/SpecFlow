@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { FunctionalSpecification } from './entities/ef.entity';
 
 // Usar require para máxima compatibilidade
@@ -6,6 +7,7 @@ const PDFDocument = require('pdfkit');
 
 @Injectable()
 export class CompatiblePdfGeneratorService {
+    constructor(private readonly configService: ConfigService) { }
 
     async generateEfPdf(ef: FunctionalSpecification): Promise<Buffer> {
         return new Promise((resolve, reject) => {
@@ -102,6 +104,7 @@ export class CompatiblePdfGeneratorService {
 
                 // Anexos se houver
                 if (ef.files && ef.files.length > 0) {
+                    const publicApiUrl = this.getPublicApiUrl();
                     doc.moveDown(1);
                     doc.fontSize(14).text('ANEXOS');
                     doc.moveDown(0.5);
@@ -115,8 +118,8 @@ export class CompatiblePdfGeneratorService {
                             .text(`${index + 1}. ${file.originalName}`)
                             .text(`   Tipo: ${file.mimetype}`)
                             .text(`   Tamanho: ${(file.size / 1024).toFixed(1)} KB`)
-                            .text(`   Link para download: http://localhost:3001/api/ef/public/file/${file.id}/${publicToken}`)
-                            .text(`   Link para visualizar: http://localhost:3001/api/ef/public/file/${file.id}/${publicToken}/view`)
+                            .text(`   Link para download: ${publicApiUrl}/ef/public/file/${file.id}/${publicToken}`)
+                            .text(`   Link para visualizar: ${publicApiUrl}/ef/public/file/${file.id}/${publicToken}/view`)
                             .moveDown(0.3);
                     });
 
@@ -140,5 +143,18 @@ export class CompatiblePdfGeneratorService {
                 reject(error);
             }
         });
+    }
+
+    private getPublicApiUrl(): string {
+        const configuredUrl =
+            this.configService.get<string>('PUBLIC_API_URL') ||
+            this.configService.get<string>('BACKEND_PUBLIC_URL');
+
+        if (configuredUrl) {
+            return configuredUrl.replace(/\/$/, '');
+        }
+
+        const port = this.configService.get<string>('PORT') || '3001';
+        return `http://localhost:${port}/api`;
     }
 }

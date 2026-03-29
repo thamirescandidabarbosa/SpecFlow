@@ -37,7 +37,7 @@ export class SupabaseService {
     return !!this.supabase;
   }
 
-  async uploadFile(bucket: string, fileName: string, file: Buffer, contentType: string) {
+  async uploadFile(bucket: string, fileName: string, file: Buffer, contentType: string): Promise<any> {
     const { data, error } = await this.getClient().storage
       .from(bucket)
       .upload(fileName, file, {
@@ -52,7 +52,7 @@ export class SupabaseService {
     return data;
   }
 
-  async downloadFile(bucket: string, fileName: string) {
+  async downloadFile(bucket: string, fileName: string): Promise<any> {
     const { data, error } = await this.getClient().storage
       .from(bucket)
       .download(fileName);
@@ -64,7 +64,7 @@ export class SupabaseService {
     return data;
   }
 
-  async deleteFile(bucket: string, fileName: string) {
+  async deleteFile(bucket: string, fileName: string): Promise<any> {
     const { data, error } = await this.getClient().storage
       .from(bucket)
       .remove([fileName]);
@@ -76,7 +76,7 @@ export class SupabaseService {
     return data;
   }
 
-  getPublicUrl(bucket: string, fileName: string) {
+  getPublicUrl(bucket: string, fileName: string): string {
     const { data } = this.getClient().storage
       .from(bucket)
       .getPublicUrl(fileName);

@@ -5,13 +5,18 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
-    const corsOrigin = process.env.CORS_ORIGIN || 'https://specflow-app.surge.sh';
-    const allowedOrigins = [
-        'http://localhost:3000',
-        'https://specflow-app.surge.sh',
-        'https://thamirescandidabarbosa.github.io',
-        ...corsOrigin.split(',').map((origin) => origin.trim()).filter(Boolean),
-    ];
+    const corsOrigin = process.env.CORS_ORIGIN || '';
+    const frontendUrl = process.env.FRONTEND_URL || '';
+    const allowedOrigins = Array.from(
+        new Set(
+            [
+                'http://localhost:3000',
+                'http://localhost:3001',
+                frontendUrl,
+                ...corsOrigin.split(',').map((origin) => origin.trim()).filter(Boolean),
+            ].filter(Boolean),
+        ),
+    );
 
     console.log('CORS configurado para:', allowedOrigins.join(', '));
 

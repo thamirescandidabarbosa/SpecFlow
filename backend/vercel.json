@@ -17,6 +17,9 @@
     "JWT_SECRET": "specflow-super-secret-jwt-key-2025",
     "JWT_EXPIRES_IN": "7d",
     "NODE_ENV": "production",
-    "CORS_ORIGIN": "https://specflow-app.surge.sh"
+    "FRONTEND_URL": "https://your-frontend-project.vercel.app",
+    "BACKEND_PUBLIC_URL": "https://your-backend-project.vercel.app",
+    "PUBLIC_API_URL": "https://your-backend-project.vercel.app/api",
+    "CORS_ORIGIN": "https://your-frontend-project.vercel.app"
   }
 }

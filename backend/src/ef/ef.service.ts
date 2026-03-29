@@ -3,6 +3,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateFunctionalSpecificationDto } from './dto/create-ef.dto';
 import { UpdateFunctionalSpecificationDto } from './dto/update-ef.dto';
 import { FunctionalSpecification } from './entities/ef.entity';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class EfService {
@@ -278,6 +280,44 @@ export class EfService {
         return await this.prisma.fileUpload.findUnique({
             where: { id: fileId }
         });
+    }
+
+    async removeFile(fileId: string, userId: string) {
+        const file = await this.prisma.fileUpload.findUnique({
+            where: { id: fileId },
+            include: {
+                functionalSpecification: {
+                    select: {
+                        id: true,
+                        authorId: true,
+                    },
+                },
+            },
+        });
+
+        if (!file) {
+            throw new NotFoundException(`Arquivo com ID "${fileId}" nao encontrado`);
+        }
+
+        if (!file.functionalSpecificationId || !file.functionalSpecification) {
+            throw new ForbiddenException('Arquivo sem especificacao funcional vinculada');
+        }
+
+        await this.verifyEditPermission(file.functionalSpecification.id, userId);
+
+        const filePath = path.resolve('./uploads/ef', file.filename);
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+        }
+
+        await this.prisma.fileUpload.delete({
+            where: { id: fileId },
+        });
+
+        return {
+            message: 'Arquivo excluido com sucesso',
+            fileId,
+        };
     }
 
     /**

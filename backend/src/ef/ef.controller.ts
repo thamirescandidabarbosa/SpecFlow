@@ -15,6 +15,7 @@ import {
     ForbiddenException,
     Res,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -80,6 +81,7 @@ const multerConfig = {
 export class EfController {
     constructor(
         private readonly efService: EfService,
+        private readonly configService: ConfigService,
         private readonly simplePdfGeneratorService: SimplePdfGeneratorService, // Usando serviço simples de PDF
         private readonly ultraSimplePdfGeneratorService: UltraSimplePdfGeneratorService, // Usando serviço ultra simples para teste
         private readonly compatiblePdfGeneratorService: CompatiblePdfGeneratorService // Usando serviço compatível
@@ -228,6 +230,11 @@ export class EfController {
         }
     }
 
+    @Delete('file/:fileId')
+    async removeFile(@Param('fileId') fileId: string, @Request() req) {
+        return this.efService.removeFile(fileId, req.user.id);
+    }
+
     @Get(':id/generate-pdf')
     async generatePdf(@Param('id') id: string, @Res() res: Response) {
         try {
@@ -367,11 +374,12 @@ export class EfController {
     async getPublicFileToken(@Param('fileId') fileId: string) {
         try {
             const token = await this.efService.generatePublicFileToken(fileId);
+            const publicApiUrl = this.getPublicApiUrl();
             return {
                 fileId,
                 token,
-                downloadUrl: `http://localhost:3001/api/ef/public/file/${fileId}/${token}`,
-                viewUrl: `http://localhost:3001/api/ef/public/file/${fileId}/${token}/view`
+                downloadUrl: `${publicApiUrl}/ef/public/file/${fileId}/${token}`,
+                viewUrl: `${publicApiUrl}/ef/public/file/${fileId}/${token}/view`
             };
         } catch (error) {
             console.error('Erro ao gerar token público:', error);
@@ -384,5 +392,17 @@ export class EfController {
         // Token simples baseado no ID do arquivo (em produção usar algo mais seguro)
         const crypto = require('crypto');
         return crypto.createHash('md5').update(fileId + 'secret-key-pdf-access').digest('hex').substring(0, 16);
+    }
+    private getPublicApiUrl(): string {
+        const configuredUrl =
+            this.configService.get<string>('PUBLIC_API_URL') ||
+            this.configService.get<string>('BACKEND_PUBLIC_URL');
+
+        if (configuredUrl) {
+            return configuredUrl.replace(/\/$/, '');
+        }
+
+        const port = this.configService.get<string>('PORT') || '3001';
+        return `http://localhost:${port}/api`;
     }
 }

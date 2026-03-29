@@ -1,36 +1,23 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { SupabaseService } from '../supabase/supabase.service';
-import { v4 as uuidv4 } from 'uuid';
+import { createReadStream, existsSync, unlinkSync } from 'fs';
 
 @Injectable()
 export class FilesService {
-    constructor(
-        private prisma: PrismaService,
-        private supabaseService: SupabaseService,
-    ) { }
+    constructor(private prisma: PrismaService) { }
 
     async uploadFile(file: Express.Multer.File, uploadedById: string) {
-        const fileName = `${uuidv4()}-${file.originalname}`;
-
-        if (!file.buffer) {
-            throw new Error('Arquivo invalido para upload em memoria');
+        if (!file.filename || !file.path) {
+            throw new Error('Arquivo invalido para upload local');
         }
-
-        await this.supabaseService.uploadFile(
-            'uploads',
-            fileName,
-            file.buffer,
-            file.mimetype
-        );
 
         return this.prisma.fileUpload.create({
             data: {
-                filename: fileName,
+                filename: file.filename,
                 originalName: file.originalname,
                 mimetype: file.mimetype,
                 size: file.size,
-                path: `uploads/${fileName}`,
+                path: file.path.replace(/\\/g, '/'),
                 uploadedById,
             },
         });
@@ -76,10 +63,12 @@ export class FilesService {
 
     async downloadFile(id: string) {
         const file = await this.findOne(id);
-        const data = await this.supabaseService.downloadFile('uploads', file.filename);
+        if (!existsSync(file.path)) {
+            throw new NotFoundException('Arquivo nao encontrado no armazenamento local');
+        }
 
         return {
-            data,
+            data: createReadStream(file.path),
             filename: file.originalName,
             mimetype: file.mimetype,
         };
@@ -87,8 +76,9 @@ export class FilesService {
 
     async remove(id: string) {
         const file = await this.findOne(id);
-
-        await this.supabaseService.deleteFile('uploads', file.filename);
+        if (existsSync(file.path)) {
+            unlinkSync(file.path);
+        }
 
         return this.prisma.fileUpload.delete({
             where: { id },
@@ -96,6 +86,6 @@ export class FilesService {
     }
 
     getFilePublicUrl(filename: string) {
-        return this.supabaseService.getPublicUrl('uploads', filename);
+        return `/uploads/files/${filename}`;
     }
 }

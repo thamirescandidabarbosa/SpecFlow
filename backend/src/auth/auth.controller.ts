@@ -57,8 +57,7 @@ export class AuthController {
     @Public()
     @UseGuards(GoogleAuthGuard)
     async googleAuthCallback(@Request() req, @Res() res: Response) {
-        const frontendUrl =
-            this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+        const frontendUrl = this.getFrontendUrl();
         const redirectUrl = new URL(frontendUrl);
         redirectUrl.pathname = `${redirectUrl.pathname.replace(/\/$/, '')}/auth/callback`;
         redirectUrl.search = '';
@@ -73,5 +72,26 @@ export class AuthController {
         redirectUrl.searchParams.set('user', JSON.stringify(req.user.user));
 
         return res.redirect(redirectUrl.toString());
+    }
+
+    private getFrontendUrl(): string {
+        const configuredFrontendUrl = this.configService.get<string>('FRONTEND_URL');
+        if (configuredFrontendUrl) {
+            return configuredFrontendUrl;
+        }
+
+        const corsOrigin = this.configService.get<string>('CORS_ORIGIN');
+        if (corsOrigin) {
+            const firstOrigin = corsOrigin
+                .split(',')
+                .map((origin) => origin.trim())
+                .find(Boolean);
+
+            if (firstOrigin) {
+                return firstOrigin;
+            }
+        }
+
+        return 'http://localhost:3000';
     }
 }

@@ -12,7 +12,9 @@ import {
     Res,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { memoryStorage } from 'multer';
+import { diskStorage } from 'multer';
+import { existsSync, mkdirSync } from 'fs';
+import { extname } from 'path';
 import { Response } from 'express';
 import { FilesService } from './files.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -25,7 +27,19 @@ export class FilesController {
     @Post('upload')
     @UseInterceptors(
         FileInterceptor('file', {
-            storage: memoryStorage(),
+            storage: diskStorage({
+                destination: (req, file, callback) => {
+                    const destination = 'uploads/files';
+                    if (!existsSync(destination)) {
+                        mkdirSync(destination, { recursive: true });
+                    }
+                    callback(null, destination);
+                },
+                filename: (req, file, callback) => {
+                    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+                    callback(null, `${uniqueSuffix}${extname(file.originalname)}`);
+                },
+            }),
             fileFilter: (req, file, callback) => {
                 const allowedMimes = [
                     'image/jpeg',
@@ -84,11 +98,9 @@ export class FilesController {
     @Get(':id/download')
     async download(@Param('id') id: string, @Res() res: Response) {
         const file = await this.filesService.downloadFile(id);
-        const arrayBuffer = await file.data.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
 
         res.setHeader('Content-Type', file.mimetype);
         res.setHeader('Content-Disposition', `attachment; filename="${file.filename}"`);
-        res.send(buffer);
+        file.data.pipe(res);
     }
 }
