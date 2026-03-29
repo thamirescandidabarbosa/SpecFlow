@@ -1,33 +1,42 @@
-# Configuração para Render
+# Configuracao para Render
 
-## 1. Build Command
+## Build Command
+
 ```bash
-npm install && npm run build && npx prisma generate && npx prisma db push
+npm install --include=dev && npx prisma generate && npm run build
 ```
 
-## 2. Start Command  
+## Start Command
+
 ```bash
 npm run start:prod
 ```
 
-## 3. Variáveis de Ambiente
+## Variaveis de ambiente
+
 ```env
-DATABASE_URL=file:./prod.db
-JWT_SECRET=specflow-super-secret-jwt-key-2025
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
+DIRECT_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE?sslmode=require
+JWT_SECRET=your-secret-key
 JWT_EXPIRES_IN=7d
 NODE_ENV=production
 PORT=10000
-CORS_ORIGIN=https://specflow-app.surge.sh
+FRONTEND_URL=https://spec-flow-jet.vercel.app
+BACKEND_PUBLIC_URL=https://specflow-backend-6a64.onrender.com
+PUBLIC_API_URL=https://specflow-backend-6a64.onrender.com/api
+CORS_ORIGIN=http://localhost:3000,https://spec-flow-jet.vercel.app
+GOOGLE_CALLBACK_URL=https://specflow-backend-6a64.onrender.com/api/auth/google/callback
 ```
 
-## 4. Passos no Render:
-1. Acesse https://render.com
-2. New → Web Service
-3. Connect GitHub → Selecione repositório SpecFlow
+## Passos no Render
+
+1. Acesse `https://render.com`
+2. Crie um `Web Service`
+3. Conecte o repositorio `SpecFlow`
 4. Configure:
-   - Name: specflow-backend
-   - Root Directory: fullstack-project/backend
-   - Build Command: npm install && npm run build && npx prisma generate && npx prisma db push
-   - Start Command: npm run start:prod
-5. Add Environment Variables
-6. Deploy!
+   - Name: `specflow-backend`
+   - Root Directory: `backend`
+   - Build Command: `npm install --include=dev && npx prisma generate && npm run build`
+   - Start Command: `npm run start:prod`
+5. Adicione as variaveis de ambiente
+6. Faça o deploy

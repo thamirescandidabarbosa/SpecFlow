@@ -1,5 +1,5 @@
-# Use Node.js 18 LTS Alpine
-FROM node:18-alpine
+# Use Node.js 20 LTS Alpine
+FROM node:20-alpine
 
 # Install necessary packages
 RUN apk add --no-cache \
