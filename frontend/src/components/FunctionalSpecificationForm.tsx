@@ -261,7 +261,6 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
             setIsSubmitting(false);
         }
     };
-    void _handleDownloadFile;
 
     const handleCreateSubmit = async (data: FormData) => {
         try {
@@ -633,6 +632,7 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
     };
 
     // Função para excluir arquivo com tratamento de erro e confirmação
+    void _handleDownloadFile;
     const handleDeleteFile = async (fileId: string, fileName: string) => {
         // Confirmar antes de excluir
         if (!window.confirm(`Tem certeza que deseja excluir o arquivo "${fileName}"? Esta ação não pode ser desfeita.`)) {
