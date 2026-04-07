@@ -131,6 +131,10 @@ const modalStyle: React.CSSProperties = {
 const Login: React.FC = () => {
     const { login, loginWithGoogle, isAuthenticated } = useAuth();
     const rememberedEmail = useMemo(() => localStorage.getItem(REMEMBERED_EMAIL_KEY) || '', []);
+    const envGoogleEnabled = useMemo(
+        () => process.env.REACT_APP_ENABLE_GOOGLE_AUTH === 'true',
+        []
+    );
     const [formData, setFormData] = useState({
         email: rememberedEmail,
         password: '',
@@ -138,8 +142,7 @@ const Login: React.FC = () => {
     const [rememberUser, setRememberUser] = useState(Boolean(rememberedEmail));
     const [isFormLoading, setIsFormLoading] = useState(false);
     const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-    const [googleEnabled, setGoogleEnabled] = useState(false);
-    const [isGoogleStatusLoading, setIsGoogleStatusLoading] = useState(true);
+    const [googleEnabled, setGoogleEnabled] = useState(envGoogleEnabled);
     const [isResetOpen, setIsResetOpen] = useState(false);
     const [isResetLoading, setIsResetLoading] = useState(false);
     const [resetData, setResetData] = useState({
@@ -156,13 +159,15 @@ const Login: React.FC = () => {
             try {
                 const response = await authService.getGoogleStatus();
                 if (isMounted) {
-                    setGoogleEnabled(response.enabled);
+                    setGoogleEnabled(response.enabled || envGoogleEnabled);
                 }
             } catch (error) {
                 console.error('Erro ao verificar Google auth:', error);
+                if (isMounted) {
+                    setGoogleEnabled(envGoogleEnabled);
+                }
             } finally {
                 if (isMounted) {
-                    setIsGoogleStatusLoading(false);
                 }
             }
         };
@@ -172,7 +177,7 @@ const Login: React.FC = () => {
         return () => {
             isMounted = false;
         };
-    }, []);
+    }, [envGoogleEnabled]);
 
     if (isAuthenticated) {
         return <Navigate to="/" replace />;
@@ -609,7 +614,7 @@ const Login: React.FC = () => {
                             </button>
                         </form>
 
-                        {!isGoogleStatusLoading && googleEnabled && (
+                        {googleEnabled && (
                             <button
                                 type="button"
                                 style={{

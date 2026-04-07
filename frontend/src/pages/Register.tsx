@@ -106,6 +106,7 @@ const Register: React.FC = () => {
         () => formData.password === formData.confirmPassword,
         [formData.password, formData.confirmPassword]
     );
+    const canSubmit = passwordIsStrong && passwordsMatch;
 
     if (isAuthenticated) {
         return <Navigate to="/" replace />;
@@ -237,6 +238,24 @@ const Register: React.FC = () => {
                                 <small style={{ display: 'block', marginTop: '8px', color: passwordIsStrong ? '#108b68' : '#6b7a93' }}>
                                     Use 8+ caracteres com maiuscula, minuscula, numero e simbolo.
                                 </small>
+                                {formData.password && (
+                                    <div
+                                        style={{
+                                            marginTop: '10px',
+                                            padding: '12px 14px',
+                                            borderRadius: '12px',
+                                            background: passwordIsStrong ? 'rgba(16, 139, 104, 0.10)' : 'rgba(13, 132, 220, 0.08)',
+                                            border: passwordIsStrong ? '1px solid rgba(16, 139, 104, 0.18)' : '1px solid rgba(13, 132, 220, 0.12)',
+                                            color: passwordIsStrong ? '#108b68' : '#48627f',
+                                            fontSize: '0.9rem',
+                                            lineHeight: 1.6,
+                                        }}
+                                    >
+                                        {passwordIsStrong
+                                            ? 'Senha forte detectada. Voce ja pode seguir para a confirmacao.'
+                                            : 'Sua senha ainda nao atende aos requisitos minimos.'}
+                                    </div>
+                                )}
                             </div>
 
                             <div style={{ marginBottom: '22px' }}>
@@ -263,16 +282,42 @@ const Register: React.FC = () => {
                                         As senhas precisam ser iguais.
                                     </small>
                                 )}
+                                {formData.confirmPassword && passwordsMatch && (
+                                    <small style={{ display: 'block', marginTop: '8px', color: '#108b68' }}>
+                                        Confirmacao correta. As senhas coincidem.
+                                    </small>
+                                )}
                             </div>
+
+                            {(!canSubmit && (formData.password || formData.confirmPassword)) && (
+                                <div
+                                    style={{
+                                        marginBottom: '18px',
+                                        padding: '14px 16px',
+                                        borderRadius: '14px',
+                                        background: 'rgba(13, 132, 220, 0.08)',
+                                        border: '1px solid rgba(13, 132, 220, 0.12)',
+                                        color: '#48627f',
+                                        lineHeight: 1.7,
+                                        fontSize: '0.92rem',
+                                    }}
+                                >
+                                    {!passwordIsStrong && <div>A senha ainda precisa ficar mais forte.</div>}
+                                    {!passwordsMatch && formData.confirmPassword && (
+                                        <div>A confirmacao da senha precisa ser igual.</div>
+                                    )}
+                                </div>
+                            )}
 
                             <button
                                 type="submit"
                                 style={{
                                     ...primaryButtonStyle,
-                                    opacity: isLoading || !passwordIsStrong || !passwordsMatch ? 0.72 : 1,
+                                    opacity: isLoading || !canSubmit ? 0.72 : 1,
                                     marginBottom: '20px',
                                 }}
-                                disabled={isLoading || !passwordIsStrong || !passwordsMatch}
+                                disabled={isLoading || !canSubmit}
+                                title={!canSubmit ? 'Complete os requisitos da senha para continuar' : undefined}
                             >
                                 {isLoading ? 'Cadastrando...' : 'Criar conta'}
                             </button>
