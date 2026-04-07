@@ -691,7 +691,7 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
     // Verificação de permissão para edição
     if (mode === 'edit' && !canEdit) {
         return (
-            <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
+            <div style={{ maxWidth: '800px', margin: '0 auto', padding: '12px' }}>
                 <div className="card">
                     <div className="card-header" style={{ backgroundColor: '#f8d7da', color: '#721c24' }}>
                         <h2 style={{ margin: 0 }}>🚫 Acesso Negado</h2>
@@ -718,8 +718,8 @@ const FunctionalSpecificationForm: React.FC<FunctionalSpecificationFormProps> = 
     }
 
     return (
-        <div className="container" style={{ maxWidth: '1000px', margin: '0 auto', padding: '20px' }}>
-            <form onSubmit={handleSubmit(onSubmit)}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+            <form onSubmit={handleSubmit(onSubmit)} className="spec-form">
                 {/* Seção 1: Informações Básicas */}
                 <div style={{ marginBottom: '30px' }}>
                     <h3 style={{

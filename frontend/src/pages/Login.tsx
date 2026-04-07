@@ -1,7 +1,12 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { ArrowRight, CheckCircle2, LogIn, ShieldCheck } from 'lucide-react';
+import { ArrowRight, CheckCircle2, KeyRound, LogIn, Mail, ShieldCheck } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { useAuth } from '../contexts/AuthContext';
+import { authService } from '../services/authService';
+
+const REMEMBERED_EMAIL_KEY = 'specflow.rememberedEmail';
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
 
 const pageStyle: React.CSSProperties = {
     minHeight: '100vh',
@@ -103,19 +108,71 @@ const decorativeLineStyle: React.CSSProperties = {
     background: 'rgba(13, 48, 86, 0.55)',
 };
 
+const overlayStyle: React.CSSProperties = {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(9, 37, 79, 0.42)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '24px',
+    zIndex: 1000,
+};
+
+const modalStyle: React.CSSProperties = {
+    width: '100%',
+    maxWidth: '460px',
+    background: '#ffffff',
+    borderRadius: '24px',
+    padding: '28px',
+    boxShadow: '0 36px 90px rgba(5, 56, 96, 0.24)',
+};
+
 const Login: React.FC = () => {
     const { login, loginWithGoogle, isAuthenticated } = useAuth();
+    const rememberedEmail = useMemo(() => localStorage.getItem(REMEMBERED_EMAIL_KEY) || '', []);
     const [formData, setFormData] = useState({
-        email: '',
+        email: rememberedEmail,
         password: '',
     });
+    const [rememberUser, setRememberUser] = useState(Boolean(rememberedEmail));
     const [isFormLoading, setIsFormLoading] = useState(false);
     const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-    const googleEnabled = useMemo(
-        () => process.env.REACT_APP_ENABLE_GOOGLE_AUTH === 'true',
-        []
-    );
+    const [googleEnabled, setGoogleEnabled] = useState(false);
+    const [isGoogleStatusLoading, setIsGoogleStatusLoading] = useState(true);
+    const [isResetOpen, setIsResetOpen] = useState(false);
+    const [isResetLoading, setIsResetLoading] = useState(false);
+    const [resetData, setResetData] = useState({
+        email: rememberedEmail,
+        newPassword: '',
+        confirmPassword: '',
+    });
     const isBusy = isFormLoading || isGoogleLoading;
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const loadGoogleStatus = async () => {
+            try {
+                const response = await authService.getGoogleStatus();
+                if (isMounted) {
+                    setGoogleEnabled(response.enabled);
+                }
+            } catch (error) {
+                console.error('Erro ao verificar Google auth:', error);
+            } finally {
+                if (isMounted) {
+                    setIsGoogleStatusLoading(false);
+                }
+            }
+        };
+
+        loadGoogleStatus();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     if (isAuthenticated) {
         return <Navigate to="/" replace />;
@@ -134,8 +191,16 @@ const Login: React.FC = () => {
         setIsFormLoading(true);
 
         try {
+            const normalizedEmail = formData.email.trim().toLowerCase();
+
+            if (rememberUser) {
+                localStorage.setItem(REMEMBERED_EMAIL_KEY, normalizedEmail);
+            } else {
+                localStorage.removeItem(REMEMBERED_EMAIL_KEY);
+            }
+
             await login({
-                email: formData.email.trim().toLowerCase(),
+                email: normalizedEmail,
                 password: formData.password,
             });
         } catch (error) {
@@ -157,7 +222,55 @@ const Login: React.FC = () => {
         }
     };
 
+    const handleRememberUserChange = (checked: boolean) => {
+        setRememberUser(checked);
+
+        if (!checked) {
+            localStorage.removeItem(REMEMBERED_EMAIL_KEY);
+        }
+    };
+
+    const handleResetPassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!passwordRegex.test(resetData.newPassword)) {
+            toast.error('Use uma senha forte com maiuscula, minuscula, numero e simbolo.');
+            return;
+        }
+
+        if (resetData.newPassword !== resetData.confirmPassword) {
+            toast.error('As senhas precisam ser iguais.');
+            return;
+        }
+
+        setIsResetLoading(true);
+
+        try {
+            const normalizedEmail = resetData.email.trim().toLowerCase();
+            await authService.resetPassword(normalizedEmail, resetData.newPassword);
+            localStorage.setItem(REMEMBERED_EMAIL_KEY, normalizedEmail);
+            setRememberUser(true);
+            setFormData((prev) => ({
+                ...prev,
+                email: normalizedEmail,
+            }));
+            toast.success('Senha redefinida com sucesso. Agora voce ja pode entrar.');
+            setIsResetOpen(false);
+            setResetData({
+                email: normalizedEmail,
+                newPassword: '',
+                confirmPassword: '',
+            });
+        } catch (error: any) {
+            const message = error.response?.data?.message || 'Nao foi possivel redefinir a senha.';
+            toast.error(message);
+        } finally {
+            setIsResetLoading(false);
+        }
+    };
+
     return (
+        <>
         <div style={pageStyle}>
             <div style={shellStyle}>
                 <section style={heroStyle}>
@@ -432,17 +545,55 @@ const Login: React.FC = () => {
                             <div
                                 style={{
                                     display: 'flex',
-                                    justifyContent: 'flex-end',
+                                    justifyContent: 'space-between',
                                     alignItems: 'center',
                                     marginBottom: '22px',
+                                    gap: '12px',
+                                    flexWrap: 'wrap',
                                 }}
                             >
-                                <Link
-                                    to="/register"
-                                    style={{ color: '#0d84dc', fontWeight: 600, textDecoration: 'none' }}
+                                <label
+                                    style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        color: '#48627f',
+                                        fontWeight: 600,
+                                        cursor: 'pointer',
+                                    }}
                                 >
-                                    Criar conta
-                                </Link>
+                                    <input
+                                        type="checkbox"
+                                        checked={rememberUser}
+                                        onChange={(e) => handleRememberUserChange(e.target.checked)}
+                                        disabled={isBusy}
+                                    />
+                                    Lembrar usuario
+                                </label>
+
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsResetOpen(true)}
+                                        style={{
+                                            background: 'none',
+                                            border: 'none',
+                                            color: '#0d84dc',
+                                            fontWeight: 600,
+                                            textDecoration: 'none',
+                                            cursor: 'pointer',
+                                            padding: 0,
+                                        }}
+                                    >
+                                        Redefinir senha
+                                    </button>
+                                    <Link
+                                        to="/register"
+                                        style={{ color: '#0d84dc', fontWeight: 600, textDecoration: 'none' }}
+                                    >
+                                        Criar conta
+                                    </Link>
+                                </div>
                             </div>
 
                             <button
@@ -458,7 +609,7 @@ const Login: React.FC = () => {
                             </button>
                         </form>
 
-                        {googleEnabled && (
+                        {!isGoogleStatusLoading && googleEnabled && (
                             <button
                                 type="button"
                                 style={{
@@ -503,6 +654,133 @@ const Login: React.FC = () => {
                 </section>
             </div>
         </div>
+        {isResetOpen && (
+            <div style={overlayStyle}>
+                <div style={modalStyle}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '18px' }}>
+                        <div
+                            style={{
+                                width: '52px',
+                                height: '52px',
+                                borderRadius: '16px',
+                                background: 'rgba(17, 123, 207, 0.1)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: '#0a7dd7',
+                            }}
+                        >
+                            <KeyRound size={24} />
+                        </div>
+                        <div>
+                            <h3 style={{ margin: 0, color: '#11254f', fontSize: '1.4rem' }}>
+                                Redefinir senha
+                            </h3>
+                            <p style={{ margin: '6px 0 0', color: '#6b7a93', lineHeight: 1.6 }}>
+                                Informe seu email e defina uma nova senha para voltar ao sistema.
+                            </p>
+                        </div>
+                    </div>
+
+                    <form onSubmit={handleResetPassword}>
+                        <div style={{ marginBottom: '16px' }}>
+                            <label
+                                htmlFor="reset-email"
+                                style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#31486f' }}
+                            >
+                                Email da conta
+                            </label>
+                            <input
+                                id="reset-email"
+                                type="email"
+                                value={resetData.email}
+                                onChange={(e) =>
+                                    setResetData((prev) => ({
+                                        ...prev,
+                                        email: e.target.value,
+                                    }))
+                                }
+                                required
+                                disabled={isResetLoading}
+                                placeholder="mail@empresa.com"
+                                style={fieldStyle}
+                            />
+                        </div>
+
+                        <div style={{ marginBottom: '16px' }}>
+                            <label
+                                htmlFor="reset-password"
+                                style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#31486f' }}
+                            >
+                                Nova senha
+                            </label>
+                            <input
+                                id="reset-password"
+                                type="password"
+                                value={resetData.newPassword}
+                                onChange={(e) =>
+                                    setResetData((prev) => ({
+                                        ...prev,
+                                        newPassword: e.target.value,
+                                    }))
+                                }
+                                required
+                                disabled={isResetLoading}
+                                placeholder="Use uma senha forte"
+                                style={fieldStyle}
+                            />
+                            <small style={{ display: 'block', marginTop: '8px', color: '#6b7a93' }}>
+                                Use 8+ caracteres com maiuscula, minuscula, numero e simbolo.
+                            </small>
+                        </div>
+
+                        <div style={{ marginBottom: '22px' }}>
+                            <label
+                                htmlFor="reset-confirm-password"
+                                style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#31486f' }}
+                            >
+                                Confirmar nova senha
+                            </label>
+                            <input
+                                id="reset-confirm-password"
+                                type="password"
+                                value={resetData.confirmPassword}
+                                onChange={(e) =>
+                                    setResetData((prev) => ({
+                                        ...prev,
+                                        confirmPassword: e.target.value,
+                                    }))
+                                }
+                                required
+                                disabled={isResetLoading}
+                                placeholder="Repita a nova senha"
+                                style={fieldStyle}
+                            />
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                            <button
+                                type="button"
+                                style={{ ...secondaryButtonStyle, flex: 1 }}
+                                onClick={() => setIsResetOpen(false)}
+                                disabled={isResetLoading}
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                type="submit"
+                                style={{ ...primaryButtonStyle, flex: 1 }}
+                                disabled={isResetLoading}
+                            >
+                                <Mail size={16} />
+                                {isResetLoading ? 'Salvando...' : 'Salvar senha'}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        )}
+        </>
     );
 };
 

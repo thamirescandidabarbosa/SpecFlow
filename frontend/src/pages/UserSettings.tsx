@@ -1,10 +1,9 @@
-// Formulário de configurações ajustado — otimizado por Thamires Candida Barbosa 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import { Lock, Save, Settings, ShieldCheck, User } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { User, Settings, Lock, Save } from 'lucide-react';
 import api from '../services/api';
 
 interface UserProfile {
@@ -28,17 +27,27 @@ interface PasswordFormData {
 }
 
 const profileSchema = yup.object().shape({
-    username: yup.string().required('Nome de usuário é obrigatório'),
-    email: yup.string().email('Email inválido').required('Email é obrigatório'),
+    username: yup.string().required('Nome de usuario e obrigatorio'),
+    email: yup.string().email('Email invalido').required('Email e obrigatorio'),
 });
 
 const passwordSchema = yup.object().shape({
-    currentPassword: yup.string().required('Senha atual é obrigatória'),
-    newPassword: yup.string().min(6, 'Nova senha deve ter pelo menos 6 caracteres').required('Nova senha é obrigatória'),
+    currentPassword: yup.string().required('Senha atual e obrigatoria'),
+    newPassword: yup.string().min(6, 'Nova senha deve ter pelo menos 6 caracteres').required('Nova senha e obrigatoria'),
     confirmPassword: yup.string()
-        .oneOf([yup.ref('newPassword')], 'Confirmação de senha não confere')
-        .required('Confirmação de senha é obrigatória'),
+        .oneOf([yup.ref('newPassword')], 'Confirmacao de senha nao confere')
+        .required('Confirmacao de senha e obrigatoria'),
 });
+
+const infoCardStyle: React.CSSProperties = {
+    background: 'linear-gradient(180deg, #ffffff 0%, #f7fbff 100%)',
+    padding: '18px',
+    borderRadius: '18px',
+    border: '1px solid #e2eef8',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+};
 
 const UserSettings: React.FC = () => {
     const [user, setUser] = useState<UserProfile | null>(null);
@@ -50,18 +59,18 @@ const UserSettings: React.FC = () => {
         register: registerProfile,
         handleSubmit: handleSubmitProfile,
         formState: { errors: profileErrors },
-        reset: resetProfile
+        reset: resetProfile,
     } = useForm<ProfileFormData>({
-        resolver: yupResolver(profileSchema)
+        resolver: yupResolver(profileSchema),
     });
 
     const {
         register: registerPassword,
         handleSubmit: handleSubmitPassword,
         formState: { errors: passwordErrors },
-        reset: resetPassword
+        reset: resetPassword,
     } = useForm<PasswordFormData>({
-        resolver: yupResolver(passwordSchema)
+        resolver: yupResolver(passwordSchema),
     });
 
     useEffect(() => {
@@ -71,11 +80,11 @@ const UserSettings: React.FC = () => {
                 setUser(response.data);
                 resetProfile({
                     username: response.data.username,
-                    email: response.data.email
+                    email: response.data.email,
                 });
             } catch (error) {
                 console.error('Erro ao carregar perfil:', error);
-                toast.error('Erro ao carregar perfil do usuário');
+                toast.error('Erro ao carregar perfil do usuario');
             } finally {
                 setLoading(false);
             }
@@ -93,7 +102,7 @@ const UserSettings: React.FC = () => {
         } catch (error: any) {
             console.error('Erro ao atualizar perfil:', error);
             if (error.response?.status === 409) {
-                toast.error('Email ou nome de usuário já está em uso');
+                toast.error('Email ou nome de usuario ja esta em uso');
             } else {
                 toast.error('Erro ao atualizar perfil');
             }
@@ -107,7 +116,7 @@ const UserSettings: React.FC = () => {
         try {
             await api.put('/users/change-password', {
                 currentPassword: data.currentPassword,
-                newPassword: data.newPassword
+                newPassword: data.newPassword,
             });
             toast.success('Senha alterada com sucesso!');
             resetPassword();
@@ -132,474 +141,203 @@ const UserSettings: React.FC = () => {
     }
 
     return (
-        <div style={{ 
-            maxWidth: '800px', 
-            margin: '20px auto', 
-            padding: '25px',
-            backgroundColor: '#fff',
-            boxShadow: '0 1px 8px rgba(0,0,0,0.08)',
-            borderRadius: '8px'
-        }}>
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                marginBottom: '30px',
-                paddingBottom: '15px',
-                borderBottom: '1px solid #f0f0f0'
-            }}>
-                <Settings size={28} color="#333" />
-                <h1 style={{ 
-                    margin: 0, 
-                    fontSize: '24px',
-                    fontWeight: '600',
-                    color: '#333'
-                }}>Configurações da Conta</h1>
-            </div>
-
-            {/* Informações do Usuário */}
-            <div className="card" style={{ 
-                marginBottom: '35px',
-                borderRadius: '6px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                border: '1px solid #eee'
-            }}>
-                <div className="card-header" style={{
-                    backgroundColor: '#f8f9fa',
-                    borderBottom: '1px solid #eee',
-                    padding: '15px 20px',
-                    borderRadius: '6px 6px 0 0'
-                }}>
-                    <h3 style={{ 
-                        margin: 0, 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '10px',
-                        fontSize: '16px',
-                        fontWeight: '600',
-                        color: '#444'
-                    }}>
-                        <User size={18} />
-                        Informações da Conta
-                    </h3>
+        <div className="page-shell">
+            <section className="page-hero">
+                <div>
+                    <div className="hero-badge">
+                        <ShieldCheck size={18} />
+                        Conta protegida
+                    </div>
+                    <h1>Configuracoes com o mesmo nivel de acabamento.</h1>
+                    <p>
+                        Atualize dados de acesso e seguranca dentro de uma area mais limpa,
+                        consistente e alinhada ao novo visual do produto.
+                    </p>
                 </div>
-                <div className="card-body" style={{
-                    padding: '20px'
-                }}>
-                    {user && (
-                        <div style={{ 
-                            display: 'flex',
-                            flexDirection: 'row',
-                            flexWrap: 'wrap',
-                            gap: '16px',
-                            justifyContent: 'space-between'
-                        }}>
-                            <div style={{
-                                backgroundColor: '#f9f9f9',
-                                padding: '14px 18px',
-                                borderRadius: '6px',
-                                border: '1px solid #eee',
-                                flex: '1',
-                                minWidth: '180px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                textAlign: 'center',
-                                boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
-                            }}>
-                                <div style={{ 
-                                    fontSize: '13px', 
-                                    color: '#666', 
-                                    marginBottom: '8px', 
-                                    textTransform: 'uppercase', 
-                                    letterSpacing: '0.5px',
-                                    fontWeight: '500'
-                                }}>Função</div>
-                                <div style={{ 
-                                    fontSize: '16px', 
-                                    fontWeight: '600',
-                                    color: user.role === 'ADMIN' ? '#007bff' : '#28a745'
-                                }}>
-                                    {user.role === 'ADMIN' ? 'Administrador' : 'Analista'}
-                                </div>
-                            </div>
-                            <div style={{
-                                backgroundColor: '#f9f9f9',
-                                padding: '14px 18px',
-                                borderRadius: '6px',
-                                border: '1px solid #eee',
-                                flex: '1',
-                                minWidth: '180px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                textAlign: 'center',
-                                boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
-                            }}>
-                                <div style={{ 
-                                    fontSize: '13px', 
-                                    color: '#666', 
-                                    marginBottom: '8px', 
-                                    textTransform: 'uppercase', 
-                                    letterSpacing: '0.5px',
-                                    fontWeight: '500'
-                                }}>Conta criada em</div>
-                                <div style={{ fontSize: '16px', fontWeight: '600' }}>
-                                    {new Date(user.createdAt).toLocaleDateString('pt-BR')}
-                                </div>
-                            </div>
-                            <div style={{
-                                backgroundColor: '#f9f9f9',
-                                padding: '14px 18px',
-                                borderRadius: '6px',
-                                border: '1px solid #eee',
-                                flex: '1',
-                                minWidth: '180px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                textAlign: 'center',
-                                boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
-                            }}>
-                                <div style={{ 
-                                    fontSize: '13px', 
-                                    color: '#666', 
-                                    marginBottom: '8px', 
-                                    textTransform: 'uppercase', 
-                                    letterSpacing: '0.5px',
-                                    fontWeight: '500'
-                                }}>Última atualização</div>
-                                <div style={{ fontSize: '16px', fontWeight: '600' }}>
-                                    {new Date(user.updatedAt).toLocaleDateString('pt-BR')}
-                                </div>
-                            </div>
+            </section>
+
+            <section className="page-panel">
+                <div className="page-panel-inner" style={{ display: 'grid', gap: '20px' }}>
+                    <div className="card">
+                        <div className="card-header">
+                            <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '10px', color: '#11254f' }}>
+                                <User size={18} />
+                                Informacoes da conta
+                            </h3>
                         </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Formulário de Perfil */}
-            <div className="card" style={{ 
-                marginBottom: '35px',
-                borderRadius: '6px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                border: '1px solid #eee'
-            }}>
-                <div className="card-header" style={{
-                    backgroundColor: '#f8f9fa',
-                    borderBottom: '1px solid #eee',
-                    padding: '15px 20px',
-                    borderRadius: '6px 6px 0 0'
-                }}>
-                    <h3 style={{ 
-                        margin: 0,
-                        fontSize: '16px',
-                        fontWeight: '600',
-                        color: '#444',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                    }}>
-                        <Settings size={18} />
-                        Editar Perfil
-                    </h3>
-                </div>
-                <div className="card-body" style={{
-                    padding: '25px 20px'
-                }}>
-                    <form onSubmit={handleSubmitProfile(onSubmitProfile)}>
-                        <div style={{ 
-                            display: 'grid', 
-                            gap: '22px',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))'
-                        }}>
-                            <div className="form-group" style={{ 
-                                display: 'flex', 
-                                flexDirection: 'column'
-                            }}>
-                                <label htmlFor="username" style={{
-                                    fontSize: '14px',
-                                    fontWeight: '500',
-                                    color: '#555',
-                                    marginBottom: '8px'
-                                }}>
-                                    Nome de Usuário
-                                </label>
-                                <input
-                                    {...registerProfile('username')}
-                                    type="text"
-                                    id="username"
-                                    className={`form-control ${profileErrors.username ? 'is-invalid' : ''}`}
-                                    placeholder="Digite seu nome de usuário"
+                        <div className="card-body">
+                            {user && (
+                                <div
                                     style={{
-                                        fontSize: '15px',
-                                        padding: '12px 15px',
-                                        borderRadius: '6px',
-                                        border: '1px solid #ddd',
-                                        transition: 'border-color 0.2s',
-                                        width: '100%'
-                                    }}
-                                />
-                                {profileErrors.username && (
-                                    <div className="invalid-feedback" style={{
-                                        color: '#dc3545',
-                                        fontSize: '13px',
-                                        marginTop: '6px'
-                                    }}>
-                                        {profileErrors.username.message}
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="form-group" style={{ 
-                                display: 'flex', 
-                                flexDirection: 'column'
-                            }}>
-                                <label htmlFor="email" style={{
-                                    fontSize: '14px',
-                                    fontWeight: '500',
-                                    color: '#555',
-                                    marginBottom: '8px'
-                                }}>
-                                    Email
-                                </label>
-                                <input
-                                    {...registerProfile('email')}
-                                    type="email"
-                                    id="email"
-                                    className={`form-control ${profileErrors.email ? 'is-invalid' : ''}`}
-                                    placeholder="Digite seu email corporativo"
-                                    style={{
-                                        fontSize: '15px',
-                                        padding: '12px 15px',
-                                        borderRadius: '6px',
-                                        border: '1px solid #ddd',
-                                        transition: 'border-color 0.2s',
-                                        width: '100%'
-                                    }}
-                                />
-                                {profileErrors.email && (
-                                    <div className="invalid-feedback" style={{
-                                        color: '#dc3545',
-                                        fontSize: '13px',
-                                        marginTop: '6px'
-                                    }}>
-                                        {profileErrors.email.message}
-                                    </div>
-                                )}
-                            </div>
-
-                            <div style={{ 
-                                gridColumn: '1/-1', 
-                                marginTop: '10px'
-                            }}>
-                                <button
-                                    type="submit"
-                                    className="btn btn-primary"
-                                    disabled={isUpdatingProfile}
-                                    style={{ 
-                                        display: 'flex', 
-                                        alignItems: 'center', 
-                                        gap: '8px', 
-                                        padding: '10px 20px',
-                                        backgroundColor: '#007bff',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '6px',
-                                        fontSize: '15px',
-                                        fontWeight: '500',
-                                        cursor: isUpdatingProfile ? 'wait' : 'pointer',
-                                        transition: 'background-color 0.2s',
-                                        opacity: isUpdatingProfile ? 0.8 : 1
+                                        display: 'grid',
+                                        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                                        gap: '16px',
                                     }}
                                 >
-                                    <Save size={18} />
-                                    {isUpdatingProfile ? 'Salvando...' : 'Salvar Alterações'}
-                                </button>
-                            </div>
+                                    <div style={infoCardStyle}>
+                                        <span style={{ fontSize: '12px', color: '#60708b', textTransform: 'uppercase', fontWeight: 700 }}>
+                                            Funcao
+                                        </span>
+                                        <strong style={{ fontSize: '16px', color: user.role === 'ADMIN' ? '#0a88df' : '#09a37d' }}>
+                                            {user.role === 'ADMIN' ? 'Administrador' : 'Analista'}
+                                        </strong>
+                                    </div>
+                                    <div style={infoCardStyle}>
+                                        <span style={{ fontSize: '12px', color: '#60708b', textTransform: 'uppercase', fontWeight: 700 }}>
+                                            Conta criada em
+                                        </span>
+                                        <strong style={{ fontSize: '16px', color: '#11254f' }}>
+                                            {new Date(user.createdAt).toLocaleDateString('pt-BR')}
+                                        </strong>
+                                    </div>
+                                    <div style={infoCardStyle}>
+                                        <span style={{ fontSize: '12px', color: '#60708b', textTransform: 'uppercase', fontWeight: 700 }}>
+                                            Ultima atualizacao
+                                        </span>
+                                        <strong style={{ fontSize: '16px', color: '#11254f' }}>
+                                            {new Date(user.updatedAt).toLocaleDateString('pt-BR')}
+                                        </strong>
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                    </form>
-                </div>
-            </div>
+                    </div>
 
-            {/* Formulário de Alteração de Senha */}
-            <div className="card" style={{ 
-                borderRadius: '6px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                border: '1px solid #eee'
-            }}>
-                <div className="card-header" style={{
-                    backgroundColor: '#f8f9fa',
-                    borderBottom: '1px solid #eee',
-                    padding: '15px 20px',
-                    borderRadius: '6px 6px 0 0'
-                }}>
-                    <h3 style={{ 
-                        margin: 0, 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '10px',
-                        fontSize: '16px',
-                        fontWeight: '600',
-                        color: '#444'
-                    }}>
-                        <Lock size={18} />
-                        Alterar Senha
-                    </h3>
-                </div>
-                <div className="card-body" style={{
-                    padding: '25px 20px'
-                }}>
-                    <form onSubmit={handleSubmitPassword(onSubmitPassword)}>
-                        <div style={{ 
-                            display: 'grid', 
-                            gap: '22px',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))'
-                        }}>
-                            <div className="form-group" style={{ 
-                                display: 'flex', 
-                                flexDirection: 'column',
-                                gridColumn: '1/-1'
-                            }}>
-                                <label htmlFor="currentPassword" style={{
-                                    fontSize: '14px',
-                                    fontWeight: '500',
-                                    color: '#555',
-                                    marginBottom: '8px'
-                                }}>
-                                    Senha Atual
-                                </label>
-                                <input
-                                    {...registerPassword('currentPassword')}
-                                    type="password"
-                                    id="currentPassword"
-                                    className={`form-control ${passwordErrors.currentPassword ? 'is-invalid' : ''}`}
-                                    placeholder="Digite sua senha atual"
+                    <div className="card">
+                        <div className="card-header">
+                            <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '10px', color: '#11254f' }}>
+                                <Settings size={18} />
+                                Editar perfil
+                            </h3>
+                        </div>
+                        <div className="card-body">
+                            <form onSubmit={handleSubmitProfile(onSubmitProfile)}>
+                                <div
                                     style={{
-                                        fontSize: '15px',
-                                        padding: '12px 15px',
-                                        borderRadius: '6px',
-                                        border: '1px solid #ddd',
-                                        transition: 'border-color 0.2s'
-                                    }}
-                                />
-                                {passwordErrors.currentPassword && (
-                                    <div className="invalid-feedback" style={{
-                                        color: '#dc3545',
-                                        fontSize: '13px',
-                                        marginTop: '6px'
-                                    }}>
-                                        {passwordErrors.currentPassword.message}
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="form-group" style={{ 
-                                display: 'flex', 
-                                flexDirection: 'column'
-                            }}>
-                                <label htmlFor="newPassword" style={{
-                                    fontSize: '14px',
-                                    fontWeight: '500',
-                                    color: '#555',
-                                    marginBottom: '8px'
-                                }}>
-                                    Nova Senha
-                                </label>
-                                <input
-                                    {...registerPassword('newPassword')}
-                                    type="password"
-                                    id="newPassword"
-                                    className={`form-control ${passwordErrors.newPassword ? 'is-invalid' : ''}`}
-                                    placeholder="Digite sua nova senha (mínimo 6 caracteres)"
-                                    style={{
-                                        fontSize: '15px',
-                                        padding: '12px 15px',
-                                        borderRadius: '6px',
-                                        border: '1px solid #ddd',
-                                        transition: 'border-color 0.2s'
-                                    }}
-                                />
-                                {passwordErrors.newPassword && (
-                                    <div className="invalid-feedback" style={{
-                                        color: '#dc3545',
-                                        fontSize: '13px',
-                                        marginTop: '6px'
-                                    }}>
-                                        {passwordErrors.newPassword.message}
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="form-group" style={{ 
-                                display: 'flex', 
-                                flexDirection: 'column'
-                            }}>
-                                <label htmlFor="confirmPassword" style={{
-                                    fontSize: '14px',
-                                    fontWeight: '500',
-                                    color: '#555',
-                                    marginBottom: '8px'
-                                }}>
-                                    Confirmar Nova Senha
-                                </label>
-                                <input
-                                    {...registerPassword('confirmPassword')}
-                                    type="password"
-                                    id="confirmPassword"
-                                    className={`form-control ${passwordErrors.confirmPassword ? 'is-invalid' : ''}`}
-                                    placeholder="Confirme sua nova senha"
-                                    style={{
-                                        fontSize: '15px',
-                                        padding: '12px 15px',
-                                        borderRadius: '6px',
-                                        border: '1px solid #ddd',
-                                        transition: 'border-color 0.2s'
-                                    }}
-                                />
-                                {passwordErrors.confirmPassword && (
-                                    <div className="invalid-feedback" style={{
-                                        color: '#dc3545',
-                                        fontSize: '13px',
-                                        marginTop: '6px'
-                                    }}>
-                                        {passwordErrors.confirmPassword.message}
-                                    </div>
-                                )}
-                            </div>
-
-                            <div style={{ 
-                                gridColumn: '1/-1', 
-                                marginTop: '10px'
-                            }}>
-                                <button
-                                    type="submit"
-                                    className="btn btn-warning"
-                                    disabled={isChangingPassword}
-                                    style={{ 
-                                        display: 'flex', 
-                                        alignItems: 'center', 
-                                        gap: '8px',
-                                        padding: '10px 20px',
-                                        backgroundColor: '#ffc107',
-                                        color: '#212529',
-                                        border: 'none',
-                                        borderRadius: '6px',
-                                        fontSize: '15px',
-                                        fontWeight: '500',
-                                        cursor: isChangingPassword ? 'wait' : 'pointer',
-                                        transition: 'background-color 0.2s',
-                                        opacity: isChangingPassword ? 0.8 : 1
+                                        display: 'grid',
+                                        gap: '20px',
+                                        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
                                     }}
                                 >
-                                    <Lock size={18} />
-                                    {isChangingPassword ? 'Alterando...' : 'Alterar Senha'}
-                                </button>
-                            </div>
+                                    <div className="form-group">
+                                        <label htmlFor="username" className="form-label">
+                                            Nome de usuario
+                                        </label>
+                                        <input
+                                            {...registerProfile('username')}
+                                            type="text"
+                                            id="username"
+                                            className="form-control"
+                                            placeholder="Digite seu nome de usuario"
+                                        />
+                                        {profileErrors.username && (
+                                            <div className="invalid-feedback">{profileErrors.username.message}</div>
+                                        )}
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label htmlFor="email" className="form-label">
+                                            Email
+                                        </label>
+                                        <input
+                                            {...registerProfile('email')}
+                                            type="email"
+                                            id="email"
+                                            className="form-control"
+                                            placeholder="Digite seu email corporativo"
+                                        />
+                                        {profileErrors.email && (
+                                            <div className="invalid-feedback">{profileErrors.email.message}</div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div style={{ marginTop: '18px' }}>
+                                    <button type="submit" className="btn btn-primary" disabled={isUpdatingProfile}>
+                                        <Save size={18} />
+                                        {isUpdatingProfile ? 'Salvando...' : 'Salvar alteracoes'}
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                    </form>
+                    </div>
+
+                    <div className="card">
+                        <div className="card-header">
+                            <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '10px', color: '#11254f' }}>
+                                <Lock size={18} />
+                                Alterar senha
+                            </h3>
+                        </div>
+                        <div className="card-body">
+                            <form onSubmit={handleSubmitPassword(onSubmitPassword)}>
+                                <div
+                                    style={{
+                                        display: 'grid',
+                                        gap: '20px',
+                                        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                                    }}
+                                >
+                                    <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                                        <label htmlFor="currentPassword" className="form-label">
+                                            Senha atual
+                                        </label>
+                                        <input
+                                            {...registerPassword('currentPassword')}
+                                            type="password"
+                                            id="currentPassword"
+                                            className="form-control"
+                                            placeholder="Digite sua senha atual"
+                                        />
+                                        {passwordErrors.currentPassword && (
+                                            <div className="invalid-feedback">{passwordErrors.currentPassword.message}</div>
+                                        )}
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label htmlFor="newPassword" className="form-label">
+                                            Nova senha
+                                        </label>
+                                        <input
+                                            {...registerPassword('newPassword')}
+                                            type="password"
+                                            id="newPassword"
+                                            className="form-control"
+                                            placeholder="Digite sua nova senha"
+                                        />
+                                        {passwordErrors.newPassword && (
+                                            <div className="invalid-feedback">{passwordErrors.newPassword.message}</div>
+                                        )}
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label htmlFor="confirmPassword" className="form-label">
+                                            Confirmar nova senha
+                                        </label>
+                                        <input
+                                            {...registerPassword('confirmPassword')}
+                                            type="password"
+                                            id="confirmPassword"
+                                            className="form-control"
+                                            placeholder="Confirme sua nova senha"
+                                        />
+                                        {passwordErrors.confirmPassword && (
+                                            <div className="invalid-feedback">{passwordErrors.confirmPassword.message}</div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div style={{ marginTop: '18px' }}>
+                                    <button type="submit" className="btn btn-warning" disabled={isChangingPassword}>
+                                        <Lock size={18} />
+                                        {isChangingPassword ? 'Alterando...' : 'Alterar senha'}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </section>
         </div>
     );
 };

@@ -4,6 +4,7 @@ import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcryptjs';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { Profile } from 'passport-google-oauth20';
 
 @Injectable()
@@ -77,6 +78,13 @@ export class AuthService {
         });
 
         return this.buildAuthResponse(user);
+    }
+
+    async resetPassword(resetPasswordDto: ResetPasswordDto) {
+        return this.usersService.resetPasswordByEmail(
+            this.normalizeEmail(resetPasswordDto.email),
+            resetPasswordDto.newPassword,
+        );
     }
 
     async loginWithGoogle(profile: Profile) {

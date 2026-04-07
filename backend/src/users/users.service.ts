@@ -149,4 +149,24 @@ export class UsersService {
 
         return { message: 'Senha alterada com sucesso' };
     }
+
+    async resetPasswordByEmail(email: string, newPassword: string) {
+        const normalizedEmail = email.trim().toLowerCase();
+        const user = await this.prisma.user.findUnique({
+            where: { email: normalizedEmail },
+        });
+
+        if (!user) {
+            return { message: 'Se o email existir, a senha foi redefinida com sucesso' };
+        }
+
+        const hashedNewPassword = await bcrypt.hash(newPassword, 12);
+
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: { password: hashedNewPassword },
+        });
+
+        return { message: 'Se o email existir, a senha foi redefinida com sucesso' };
+    }
 }

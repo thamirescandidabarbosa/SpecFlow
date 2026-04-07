@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import FunctionalSpecificationForm from '../components/FunctionalSpecificationForm';
 import { FileText, Plus } from 'lucide-react';
+import FunctionalSpecificationForm from '../components/FunctionalSpecificationForm';
 
 const FunctionalSpecForm: React.FC = () => {
     const navigate = useNavigate();
@@ -15,66 +15,48 @@ const FunctionalSpecForm: React.FC = () => {
     };
 
     return (
-        <div style={{ 
-            maxWidth: '1200px', 
-            margin: '20px auto', 
-            padding: '25px',
-            backgroundColor: '#fff',
-            boxShadow: '0 1px 8px rgba(0,0,0,0.08)',
-            borderRadius: '8px'
-        }}>
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                marginBottom: '30px',
-                paddingBottom: '15px',
-                borderBottom: '1px solid #f0f0f0'
-            }}>
-                <FileText size={28} color="#155724" />
-                <h1 style={{ 
-                    margin: 0, 
-                    fontSize: '24px',
-                    fontWeight: '600',
-                    color: '#333'
-                }}>Nova Especificação Funcional</h1>
-            </div>
-
-            <div className="card" style={{ 
-                marginBottom: '35px',
-                borderRadius: '6px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                border: '1px solid #eee'
-            }}>
-                <div className="card-header" style={{
-                    backgroundColor: '#d4edda',
-                    borderBottom: '1px solid #c3e6cb',
-                    padding: '15px 20px',
-                    borderRadius: '6px 6px 0 0'
-                }}>
-                    <h3 style={{ 
-                        margin: 0, 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '10px',
-                        fontSize: '16px',
-                        fontWeight: '600',
-                        color: '#155724'
-                    }}>
+        <div className="page-shell">
+            <section className="page-hero">
+                <div>
+                    <div className="hero-badge">
                         <Plus size={18} />
-                        Preencha os dados para criar uma nova Especificação Funcional
-                    </h3>
+                        Nova entrega estruturada
+                    </div>
+                    <h1>Crie uma especificacao com a mesma linguagem do acesso.</h1>
+                    <p>
+                        O fluxo de criacao agora fica mais leve visualmente, com uma base mais
+                        clara e consistente para preencher todos os detalhes da entrega.
+                    </p>
                 </div>
-                <div className="card-body" style={{
-                    padding: '25px 20px'
-                }}>
-                    <FunctionalSpecificationForm
-                        mode="create"
-                        onSuccess={handleSuccess}
-                        onCancel={handleCancel}
-                    />
-                </div>
-            </div>
+            </section>
+
+            <section className="page-panel-inner">
+                    <div className="card" style={{ marginBottom: '0' }}>
+                        <div className="card-header">
+                            <h3
+                                style={{
+                                    margin: 0,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '10px',
+                                    fontSize: '16px',
+                                    fontWeight: 700,
+                                    color: '#11254f',
+                                }}
+                            >
+                                <FileText size={18} />
+                                Preencha os dados para criar uma nova especificacao funcional
+                            </h3>
+                        </div>
+                        <div className="card-body">
+                            <FunctionalSpecificationForm
+                                mode="create"
+                                onSuccess={handleSuccess}
+                                onCancel={handleCancel}
+                            />
+                        </div>
+                    </div>
+            </section>
         </div>
     );
 };

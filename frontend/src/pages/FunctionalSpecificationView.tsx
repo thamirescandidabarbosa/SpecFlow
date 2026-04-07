@@ -86,25 +86,14 @@ const FunctionalSpecificationView: React.FC = () => {
 
     if (error || !spec) {
         return (
-            <div style={{ 
-                maxWidth: '800px', 
-                margin: '20px auto', 
-                padding: '25px',
-                backgroundColor: '#fff',
-                boxShadow: '0 1px 8px rgba(0,0,0,0.08)',
-                borderRadius: '8px'
-            }}>
+            <div className="page-panel">
+                <div className="page-panel-inner">
                 <div className="card" style={{ 
-                    borderRadius: '6px',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                    border: '1px solid #eee'
+                    borderRadius: '22px'
                 }}>
                     <div className="card-header" style={{ 
-                        backgroundColor: '#f8d7da', 
-                        color: '#721c24',
-                        borderBottom: '1px solid #f5c6cb',
-                        padding: '15px 20px',
-                        borderRadius: '6px 6px 0 0'
+                        backgroundColor: '#fff3f5', 
+                        color: '#b93a52'
                     }}>
                         <h3 style={{ 
                             margin: 0,
@@ -123,7 +112,7 @@ const FunctionalSpecificationView: React.FC = () => {
                     }}>
                         <div style={{ textAlign: 'center', padding: '20px' }}>
                             <h3 style={{ 
-                                color: '#dc3545', 
+                                color: '#b93a52', 
                                 marginBottom: '20px',
                                 fontSize: '18px',
                                 fontWeight: '500'
@@ -148,19 +137,14 @@ const FunctionalSpecificationView: React.FC = () => {
                         </div>
                     </div>
                 </div>
+                </div>
             </div>
         );
     }
 
     return (
-        <div style={{ 
-            maxWidth: '1200px', 
-            margin: '20px auto', 
-            padding: '25px',
-            backgroundColor: '#fff',
-            boxShadow: '0 1px 8px rgba(0,0,0,0.08)',
-            borderRadius: '8px'
-        }}>
+        <div className="page-panel">
+            <div className="page-panel-inner">
             {/* Header */}
             <div style={{
                 display: 'flex',
@@ -1112,6 +1096,7 @@ const FunctionalSpecificationView: React.FC = () => {
                     </div>
                 </div>
             )}
+            </div>
         </div>
     );
 };

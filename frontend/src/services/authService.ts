@@ -19,6 +19,14 @@ export const authService = {
         return response.data;
     },
 
+    async resetPassword(email: string, newPassword: string): Promise<{ message: string }> {
+        const response = await api.post('/auth/reset-password', {
+            email,
+            newPassword,
+        });
+        return response.data;
+    },
+
     async fetchCurrentUser(): Promise<User> {
         const response = await api.get('/auth/me');
         return response.data;

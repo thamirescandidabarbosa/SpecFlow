@@ -77,8 +77,10 @@ function AppContent() {
             {isAuthPage ? (
                 routes
             ) : (
-                <main className="container" style={{ marginTop: '20px' }}>
+                <main className="app-main">
+                    <div className="container">
                     {routes}
+                    </div>
                 </main>
             )}
             <ToastContainer

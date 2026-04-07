@@ -2,6 +2,7 @@ import { Controller, Post, Body, HttpCode, HttpStatus, Get, UseGuards, Request, 
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { GoogleAuthGuard } from './google-auth.guard';
 import { ConfigService } from '@nestjs/config';
@@ -26,6 +27,12 @@ export class AuthController {
     @Public()
     async register(@Body() registerDto: RegisterDto) {
         return this.authService.register(registerDto);
+    }
+
+    @Post('reset-password')
+    @Public()
+    async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+        return this.authService.resetPassword(resetPasswordDto);
     }
 
     @Get('me')
